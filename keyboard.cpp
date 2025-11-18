@@ -52,7 +52,7 @@ static void keyUp(int key)
 
 }
 
-
+//  キーボード制御の初期化
 void Keyboard_Initialize(void)
 {
     Keyboard_Reset();
