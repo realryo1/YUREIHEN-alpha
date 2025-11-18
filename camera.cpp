@@ -322,10 +322,12 @@ void Camera_Update(void)
     ApplyCameraTransform();
 }
 
+// 描画処理（デバッグ用カメラ表示などに使用予定）
 void Camera_Draw(void)
 {
 }
 
+//  カメラオブジェクトを取得
 Camera* GetCamera(void)
 {
     return CameraObject;
