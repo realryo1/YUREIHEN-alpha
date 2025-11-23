@@ -232,6 +232,8 @@ void Mouse_ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
             memset(&gState, 0, sizeof(gState));
             gState.scrollWheelValue = scrollWheel;
             gInFocus = false;
+            gRelativeX = INT32_MAX;
+            gRelativeY = INT32_MAX;
         }
         return;
 
