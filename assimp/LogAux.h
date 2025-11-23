@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -115,3 +115,4 @@ private:
 } // ! Assimp
 
 #endif // INCLUDED_AI_LOGAUX_H
+

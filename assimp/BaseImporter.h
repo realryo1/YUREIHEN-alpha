@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -394,3 +394,4 @@ protected:
 } // end of namespace Assimp
 
 #endif // AI_BASEIMPORTER_H_INC
+

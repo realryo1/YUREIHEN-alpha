@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include "main.h"
 
 enum CameraControlMode
 {
-	CAMERA_MODE_KEYBOARD,   // Šù‘¶‚ÌƒL[ƒ{[ƒh‘€ìƒ‚[ƒh
-	CAMERA_MODE_MOUSE_FPS   // FPSƒXƒ^ƒCƒ‹‚Ìƒ}ƒEƒX‘€ìƒ‚[ƒh
+	CAMERA_MODE_KEYBOARD,   // æ—¢å­˜ã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æ“ä½œãƒ¢ãƒ¼ãƒ‰
+	CAMERA_MODE_MOUSE_FPS   // FPSã‚¹ã‚¿ã‚¤ãƒ«ã®ãƒã‚¦ã‚¹æ“ä½œãƒ¢ãƒ¼ãƒ‰
 };
 
 class Camera
@@ -17,10 +17,10 @@ protected:
 	XMMATRIX m_View;
 	XMMATRIX m_Projection;
 
-	float m_Fov; //‹–ìŠp
-	float m_Aspect;//ƒAƒXƒyƒNƒg”ä
-	float m_Near;//‹ß‚­‚ÌŒÀŠE’l
-	float m_Far;//‰“‚­‚ÌŒÀŠE’l
+	float m_Fov; //è¦–é‡è§’
+	float m_Aspect;//ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+	float m_Near;//è¿‘ãã®é™ç•Œå€¤
+	float m_Far;//é ãã®é™ç•Œå€¤
 
 public:
 	Camera(
@@ -29,7 +29,7 @@ public:
 		XMFLOAT3 upvec = XMFLOAT3(0.0f, 1.0f, 0.0f),
 		float fov = 45.0f,
 		float aspect = SCREEN_WIDTH / SCREEN_HEIGHT,
-		float near_ = 0.2f,//ƒAƒ“ƒ_[ƒo[‚Í’è”‰ñ”ğ
+		float near_ = 0.2f,//ã‚¢ãƒ³ãƒ€ãƒ¼ãƒãƒ¼ã¯å®šæ•°å›é¿
 		float far_ = 100.0f)
 		:m_Pos(pos), m_AtPos(atpos), m_UpVec(upvec),
 		m_Fov(fov), m_Aspect(aspect), m_Near(near_), m_Far(far_)

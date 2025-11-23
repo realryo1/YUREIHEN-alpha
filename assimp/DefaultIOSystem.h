@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -97,3 +97,4 @@ public:
 } //!ns Assimp
 
 #endif //AI_DEFAULTIOSYSTEM_H_INC
+

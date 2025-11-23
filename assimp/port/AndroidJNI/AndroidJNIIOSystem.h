@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -86,3 +86,4 @@ public:
 
 #endif //AI_ANDROIDJNIIOSYSTEM_H_INC
 #endif //__ANDROID__ and __ANDROID_API__ > 9 and defined(AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT)
+

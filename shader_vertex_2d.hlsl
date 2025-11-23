@@ -1,11 +1,11 @@
-/*==============================================================================
+ï»¿/*==============================================================================
 
-   2D•`‰æ—p’¸“_ƒVƒF[ƒ_[ [shader_vertex_2d.hlsl]
+   2Dæç”»ç”¨é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ [shader_vertex_2d.hlsl]
 --------------------------------------------------------------------------------
 
 ==============================================================================*/
 
-// ’è”ƒoƒbƒtƒ@
+// å®šæ•°ãƒãƒƒãƒ•ã‚¡
 cbuffer Buffer0 : register(b0)
 {
     float4x4 mtx;
@@ -30,7 +30,7 @@ cbuffer Buffer2 : register(b2)
     LIGHT Light;
 };
 
-//“ü—Í—p’¸“_\‘¢‘Ì
+//å…¥åŠ›ç”¨é ‚ç‚¹æ§‹é€ ä½“
 struct VS_INPUT
 {
     float4 posL : POSITION0;
@@ -40,7 +40,7 @@ struct VS_INPUT
 	
 };
 
-//o—Í—p’¸“_\‘¢‘Ì
+//å‡ºåŠ›ç”¨é ‚ç‚¹æ§‹é€ ä½“
 struct VS_OUTPUT
 {
     float4 posH : SV_POSITION;
@@ -52,25 +52,25 @@ VS_OUTPUT main(VS_INPUT vs_in)
 {
     VS_OUTPUT vs_out;
     
-    //’¸“_‚ğs—ñ‚Å•ÏŠ·
+    //é ‚ç‚¹ã‚’è¡Œåˆ—ã§å¤‰æ›
     vs_out.posH = mul(vs_in.posL, mtx);
-    //t’¸“_Color‚Í‚»‚Ì‚Ü‚Üo—Í
+    //té ‚ç‚¹Colorã¯ãã®ã¾ã¾å‡ºåŠ›
     vs_out.color = vs_in.color;
     
     vs_out.texcoord = vs_in.texcoord;
    
     if (Light.enable == true)
     {
-        //–@ü‚ğƒ[ƒ‹ƒh•ÏŠ·
-        float4 normal = float4(vs_in.normal.xyz, 0.0f);//–@ü‚ğƒRƒs[
-        normal = mul(normal, worldMtx); //ƒ[ƒ‹ƒh•ÏŠ·
-        normal = normalize(normal); //³‹K‰»
+        //æ³•ç·šã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›
+        float4 normal = float4(vs_in.normal.xyz, 0.0f);//æ³•ç·šã‚’ã‚³ãƒ”ãƒ¼
+        normal = mul(normal, worldMtx); //ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›
+        normal = normalize(normal); //æ­£è¦åŒ–
         
-        //ƒ‰ƒCƒeƒBƒ“ƒO
+        //ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°
         float light = -dot(normal.xyz, -Light.Direction.xyz);
-        light = saturate(light); //0`1‚ÉƒNƒ‰ƒ“ƒv –O˜a‰‰Z
+        light = saturate(light); //0ï½1ã«ã‚¯ãƒ©ãƒ³ãƒ— é£½å’Œæ¼”ç®—
         vs_out.color.rgb *= light;
-        vs_out.color.rgb += Light.Ambient.rgb; //ŠÂ‹«Œõ‚ğ‰ÁZ
+        vs_out.color.rgb += Light.Ambient.rgb; //ç’°å¢ƒå…‰ã‚’åŠ ç®—
     }
     
     
@@ -78,7 +78,7 @@ VS_OUTPUT main(VS_INPUT vs_in)
 }
 
 //=============================================================================
-// ’¸“_ƒVƒF[ƒ_
+// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€
 //=============================================================================
 
 
@@ -91,3 +91,4 @@ VS_OUTPUT main(VS_INPUT vs_in)
 //{
 //	return mul(posL, mtx);
 //}
+

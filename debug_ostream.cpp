@@ -1,4 +1,4 @@
-#include "debug_ostream.h"
+﻿#include "debug_ostream.h"
 
 namespace hal
 {

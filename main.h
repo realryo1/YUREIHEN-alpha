@@ -1,25 +1,25 @@
-#pragma once
+ï»¿#pragma once
 //==================================
-//ƒ}ƒNƒ’è‹`
+//ãƒžã‚¯ãƒ­å®šç¾©
 //==================================
-#include <SDKDDKVer.h> //—˜—p‚Å‚«‚éÅ‚àãˆÊ‚ÌWindowsƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ª’è‹`‚³‚ê‚é
+#include <SDKDDKVer.h> //åˆ©ç”¨ã§ãã‚‹æœ€ã‚‚ä¸Šä½ã®Windowsãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒå®šç¾©ã•ã‚Œã‚‹
 #include <windows.h>
 #include <algorithm>
 #include "direct3d.h"
 #include "scene.h"
 
 #define CLASS_NAME "DX21 Window"
-#define WINDOW_CAPTION "ƒ|ƒŠƒSƒ“•`‰æ"
+#define WINDOW_CAPTION "ãƒãƒªã‚´ãƒ³æç”»"
 #define SCREEN_WIDTH (1280.0f)
 #define SCREEN_HEIGHT (720.0f)
-#define WIN32_LEAN_AND_MEAN	//32bitƒAƒvƒŠ‚É‚Í•s—v‚Èî•ñ‚ð–³Ž‹
+#define WIN32_LEAN_AND_MEAN	//32bitã‚¢ãƒ—ãƒªã«ã¯ä¸è¦ãªæƒ…å ±ã‚’ç„¡è¦–
 #define FPS (60)	
 
 using namespace DirectX;
 
 //==================================
-//ƒvƒƒgƒ^ƒCƒvéŒ¾
+//ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //==================================
-//ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-//ƒR[ƒ‹ƒoƒbƒNŠÖ”‚Í‘¼l‚ªŒÄ‚Ño‚·‚à‚Ì
+//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+//ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã¯ä»–äººãŒå‘¼ã³å‡ºã™ã‚‚ã®
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

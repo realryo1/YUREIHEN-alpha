@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -67,3 +67,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_METADATA_SOURCE_COPYRIGHT "SourceAsset_Copyright"
 
 #endif
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -74,4 +74,5 @@ ASSIMP_API aiAnimMesh *aiCreateAnimMesh(const aiMesh *mesh,
 } // end of namespace Assimp
 
 #endif // INCLUDED_AI_CREATE_ANIM_MESH_H
+
 

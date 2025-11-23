@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -277,3 +277,4 @@ AI_FORCE_INLINE std::string ai_str_toprintable(const char *in, int len, char pla
 
 
 #endif // INCLUDED_AI_STRINGUTILS_H
+

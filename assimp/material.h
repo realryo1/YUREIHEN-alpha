@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -1679,3 +1679,4 @@ C_ENUM aiReturn aiGetMaterialTexture(const C_STRUCT aiMaterial *mat,
 #endif //!__cplusplus
 
 #endif //!!AI_MATERIAL_H_INC
+

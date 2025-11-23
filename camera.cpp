@@ -1,4 +1,4 @@
-#include "camera.h"
+ï»¿#include "camera.h"
 #include "d3d11.h"
 #include "DirectXMath.h"
 using namespace DirectX;
@@ -21,12 +21,12 @@ float cameraDistance = 5.0f;
 static CameraControlMode currentMode = CAMERA_MODE_KEYBOARD;
 static Mouse_State previousMouseState = {};
 
-// ƒJ[ƒ\ƒ‹‚ğŠmÀ‚É•\¦/”ñ•\¦‚É‚·‚éŠÖ”[web:54][web:55]
+// ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç¢ºå®Ÿã«è¡¨ç¤º/éè¡¨ç¤ºã«ã™ã‚‹é–¢æ•°[web:54][web:55]
 static void EnsureCursorVisible(bool visible)
 {
     if (visible)
     {
-        // ƒJ[ƒ\ƒ‹‚ª•\¦‚³‚ê‚é‚Ü‚ÅShowCursor(TRUE)‚ğŒÄ‚Ô[web:52][web:53]
+        // ã‚«ãƒ¼ã‚½ãƒ«ãŒè¡¨ç¤ºã•ã‚Œã‚‹ã¾ã§ShowCursor(TRUE)ã‚’å‘¼ã¶[web:52][web:53]
         int count = ShowCursor(TRUE);
         while (count < 0)
         {
@@ -35,7 +35,7 @@ static void EnsureCursorVisible(bool visible)
     }
     else
     {
-        // ƒJ[ƒ\ƒ‹‚ª”ñ•\¦‚É‚È‚é‚Ü‚ÅShowCursor(FALSE)‚ğŒÄ‚Ô[web:52][web:53]
+        // ã‚«ãƒ¼ã‚½ãƒ«ãŒéè¡¨ç¤ºã«ãªã‚‹ã¾ã§ShowCursor(FALSE)ã‚’å‘¼ã¶[web:52][web:53]
         int count = ShowCursor(FALSE);
         while (count >= 0)
         {
@@ -50,7 +50,7 @@ void Camera_Initialize(void)
     currentMode = CAMERA_MODE_KEYBOARD;
     Mouse_GetState(&previousMouseState);
 
-    // ‰Šúó‘Ô‚Å‚ÍƒJ[ƒ\ƒ‹‚ğ•\¦[web:54]
+    // åˆæœŸçŠ¶æ…‹ã§ã¯ã‚«ãƒ¼ã‚½ãƒ«ã‚’è¡¨ç¤º[web:54]
     EnsureCursorVisible(true);
 }
 
@@ -64,7 +64,7 @@ void Camera_Finalize(void)
 
 static void UpdateKeyboardMode(void)
 {
-    // ƒsƒbƒ`‰ñ“]
+    // ãƒ”ãƒƒãƒå›è»¢
     if (Keyboard_IsKeyDown(KK_UP))
     {
         rotate.x -= 0.05f;
@@ -88,7 +88,7 @@ static void UpdateKeyboardMode(void)
         rotate_x_ruiseki = -ROTATE_Y_MAX;
     }
 
-    // ƒˆ[‰ñ“]
+    // ãƒ¨ãƒ¼å›è»¢
     if (Keyboard_IsKeyDown(KK_RIGHT))
     {
         rotate.y += 0.05f;
@@ -102,7 +102,7 @@ static void UpdateKeyboardMode(void)
         rotate.y *= 0.9f;
     }
 
-    // ˆÚ“®ˆ—
+    // ç§»å‹•å‡¦ç†
     if (Keyboard_IsKeyDown(KK_W))
     {
         move.z += 0.01f;
@@ -142,7 +142,7 @@ static void UpdateKeyboardMode(void)
         move.y *= 0.9f;
     }
 
-    // §ŒÀ
+    // åˆ¶é™
     rotate.x = max(-1.5f, min(1.5f, rotate.x));
     rotate.y = max(-1.5f, min(1.5f, rotate.y));
     rotate.z = max(-1.5f, min(1.5f, rotate.z));
@@ -172,7 +172,7 @@ static void UpdateMouseFPSMode(void)
         rotate_x_ruiseki = -ROTATE_Y_MAX;
     }
 
-    // ˆÚ“®ˆ—
+    // ç§»å‹•å‡¦ç†
     if (Keyboard_IsKeyDown(KK_W))
     {
         move.z += 0.01f;
@@ -282,7 +282,7 @@ static void ApplyCameraTransform(void)
 
 void Camera_Update(void)
 {
-    // TabƒL[‚Åƒ‚[ƒhØ‚è‘Ö‚¦[web:55]
+    // Tabã‚­ãƒ¼ã§ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆ[web:55]
     if (Keyboard_IsKeyDownTrigger(KK_TAB))
     {
         if (currentMode == CAMERA_MODE_KEYBOARD)
@@ -290,7 +290,7 @@ void Camera_Update(void)
             currentMode = CAMERA_MODE_MOUSE_FPS;
             Mouse_SetMode(MOUSE_POSITION_MODE_RELATIVE);
 
-            // ƒJ[ƒ\ƒ‹‚ğŠmÀ‚É”ñ•\¦[web:54][web:55]
+            // ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç¢ºå®Ÿã«éè¡¨ç¤º[web:54][web:55]
             EnsureCursorVisible(false);
 
             rotate.x = 0.0f;
@@ -302,7 +302,7 @@ void Camera_Update(void)
             currentMode = CAMERA_MODE_KEYBOARD;
             Mouse_SetMode(MOUSE_POSITION_MODE_ABSOLUTE);
 
-            // ƒJ[ƒ\ƒ‹‚ğŠmÀ‚É•\¦[web:54][web:55]
+            // ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç¢ºå®Ÿã«è¡¨ç¤º[web:54][web:55]
             EnsureCursorVisible(true);
 
             rotate.x = 0.0f;
@@ -322,12 +322,12 @@ void Camera_Update(void)
     ApplyCameraTransform();
 }
 
-// •`‰æˆ—iƒfƒoƒbƒO—pƒJƒƒ‰•\¦‚È‚Ç‚Ég—p—\’èj
+// æç”»å‡¦ç†ï¼ˆãƒ‡ãƒãƒƒã‚°ç”¨ã‚«ãƒ¡ãƒ©è¡¨ç¤ºãªã©ã«ä½¿ç”¨äºˆå®šï¼‰
 void Camera_Draw(void)
 {
 }
 
-//  ƒJƒƒ‰ƒIƒuƒWƒFƒNƒg‚ğæ“¾
+//  ã‚«ãƒ¡ãƒ©ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
 Camera* GetCamera(void)
 {
     return CameraObject;
@@ -359,3 +359,4 @@ void Camera_SetMode(CameraControlMode mode)
     rotate.x = 0.0f;
     rotate.y = 0.0f;
 }
+

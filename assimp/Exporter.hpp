@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -507,3 +507,4 @@ inline aiReturn Exporter ::Export(const aiScene *pScene, const std::string &pFor
 
 #endif // ASSIMP_BUILD_NO_EXPORT
 #endif // AI_EXPORT_HPP_INC
+

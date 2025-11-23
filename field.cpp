@@ -1,26 +1,26 @@
-#include "field.h"
+Ôªø#include "field.h"
 #include "texture.h"
 #include "Camera.h"
 #include "sprite.h"
 #include "box.h"
 
-//ÉOÉçÅ[ÉoÉãïœêî
+//„Ç∞„É≠„Éº„Éê„É´Â§âÊï∞
 static ID3D11Device* g_pDevice = NULL;
 static ID3D11DeviceContext* g_pContext = NULL;
-//í∏ì_ÉoÉbÉtÉ@
+//È†ÇÁÇπ„Éê„ÉÉ„Éï„Ç°
 static ID3D11Buffer* g_VertexBuffer = NULL;
-//ÉCÉìÉfÉbÉNÉXÉoÉbÉtÉ@
+//„Ç§„É≥„Éá„ÉÉ„ÇØ„Çπ„Éê„ÉÉ„Éï„Ç°
 static ID3D11Buffer* g_IndexBuffer = NULL;
-//ÉeÉNÉXÉ`ÉÉïœêî
+//„ÉÜ„ÇØ„Çπ„ÉÅ„É£Â§âÊï∞
 static ID3D11ShaderResourceView* g_Texture;
 
-//î†âÒì]
+//ÁÆ±ÂõûËª¢
 XMFLOAT3 rotateBox = XMFLOAT3(0, 0, 0);
 
-//É}ÉbÉvÉfÅ[É^
+//„Éû„ÉÉ„Éó„Éá„Éº„Çø
 MAPDATA Map[] =
 {
-	//1çsñ⁄
+	//1Ë°åÁõÆ
 	XMFLOAT3(1.0f, 2.0f, 1.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 1.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f, 1.0f), FIELD_BOX,
@@ -29,7 +29,7 @@ MAPDATA Map[] =
 	XMFLOAT3(6.0f, 2.0f, 1.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f, 1.0f), FIELD_BOX,
 
-	//2çsñ⁄			   
+	//2Ë°åÁõÆ			   
 	XMFLOAT3(1.0f, 2.0f, 2.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 2.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f, 2.0f), FIELD_BOX,
@@ -38,7 +38,7 @@ MAPDATA Map[] =
 	XMFLOAT3(6.0f, 2.0f, 2.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f, 2.0f), FIELD_BOX,
 
-	//3çsñ⁄			   	 
+	//3Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f, 3.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 3.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f, 3.0f), FIELD_BOX,
@@ -47,7 +47,7 @@ MAPDATA Map[] =
 	XMFLOAT3(6.0f, 2.0f, 3.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f, 3.0f), FIELD_BOX,
 
-	//4çsñ⁄			   	 
+	//4Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f, 4.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 4.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f, 4.0f), FIELD_BOX,
@@ -61,7 +61,7 @@ MAPDATA Map[] =
 	XMFLOAT3(11.0f, 2.0f, 4.0f), FIELD_BOX,
 	XMFLOAT3(12.0f, 2.0f, 4.0f), FIELD_BOX,
 
-	//5çsñ⁄			   	 
+	//5Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f, 5.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 5.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 3.0f, 5.0f), FIELD_BOX,
@@ -78,7 +78,7 @@ MAPDATA Map[] =
 	XMFLOAT3(12.0f,1.0f, 5.0f), FIELD_BOX,
 	XMFLOAT3(13.0f, 2.0f, 5.0f), FIELD_BOX,
 
-	//6çsñ⁄			   	 
+	//6Ë°åÁõÆ			   	 
 	XMFLOAT3(3.0f, 3.0f, 6.0f), FIELD_BOX,
 	XMFLOAT3(4.0f, 3.0f, 6.0f), FIELD_BOX,
 	XMFLOAT3(7.0f,1.0f, 6.0f), FIELD_BOX,
@@ -88,7 +88,7 @@ MAPDATA Map[] =
 	XMFLOAT3(13.0f,1.0f, 6.0f), FIELD_BOX,
 	XMFLOAT3(14.0f, 2.0f, 6.0f), FIELD_BOX,
 
-	//7çsñ⁄			   	 
+	//7Ë°åÁõÆ			   	 
 	XMFLOAT3(3.0f, 3.0f, 7.0f), FIELD_BOX,
 	XMFLOAT3(4.0f, 3.0f, 7.0f), FIELD_BOX,
 	XMFLOAT3( 6.0f,1.0f, 7.0f), FIELD_BOX,
@@ -100,7 +100,7 @@ MAPDATA Map[] =
 	XMFLOAT3(15.0f, 2.0f, 7.0f), FIELD_BOX,
 
 
-	//8çsñ⁄			   	 
+	//8Ë°åÁõÆ			   	 
 	XMFLOAT3(3.0f, 3.0f, 8.0f), FIELD_BOX,
 	XMFLOAT3(4.0f, 3.0f, 8.0f), FIELD_BOX,
 	XMFLOAT3(7.0f,1.0f,  8.0f), FIELD_BOX,
@@ -111,7 +111,7 @@ MAPDATA Map[] =
 
 	XMFLOAT3(14.0f, 2.0f, 8.0f), FIELD_BOX,
 
-	//9çsñ⁄			   	 
+	//9Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f, 9.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f, 9.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 3.0f, 9.0f), FIELD_BOX,
@@ -128,7 +128,7 @@ MAPDATA Map[] =
 	XMFLOAT3(12.0f,1.0f, 9.0f), FIELD_BOX,
 	XMFLOAT3(13.0f, 2.0f, 9.0f), FIELD_BOX,
 
-	//10çsñ⁄			   	 
+	//10Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f,10.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f,10.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f,10.0f), FIELD_BOX,
@@ -142,7 +142,7 @@ MAPDATA Map[] =
 	XMFLOAT3(11.0f, 2.0f,10.0f), FIELD_BOX,
 	XMFLOAT3(12.0f, 2.0f,10.0f), FIELD_BOX,
 
-	//11çsñ⁄			   	 
+	//11Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f,11.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f,11.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f,11.0f), FIELD_BOX,
@@ -151,7 +151,7 @@ MAPDATA Map[] =
 	XMFLOAT3(6.0f, 2.0f,11.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f,11.0f), FIELD_BOX,
 
-	//12çsñ⁄			   	 
+	//12Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f,12.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f,12.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f,12.0f), FIELD_BOX,
@@ -160,7 +160,7 @@ MAPDATA Map[] =
 	XMFLOAT3(6.0f, 2.0f,12.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f,12.0f), FIELD_BOX,
 
-	//13çsñ⁄			   	 
+	//13Ë°åÁõÆ			   	 
 	XMFLOAT3(1.0f, 2.0f,13.0f), FIELD_BOX,
 	XMFLOAT3(2.0f, 2.0f,13.0f), FIELD_BOX,
 	XMFLOAT3(3.0f, 2.0f,13.0f), FIELD_BOX,
@@ -168,7 +168,7 @@ MAPDATA Map[] =
 	XMFLOAT3(5.0f, 2.0f,13.0f), FIELD_BOX,
 	XMFLOAT3(6.0f, 2.0f,13.0f), FIELD_BOX,
 	XMFLOAT3(7.0f, 2.0f,13.0f), FIELD_BOX,
-	XMFLOAT3(2.0f, -1.0f, 5.0f), FIELD_MAX, //MAPÉfÅ[É^èIóπ
+	XMFLOAT3(2.0f, -1.0f, 5.0f), FIELD_MAX, //MAP„Éá„Éº„ÇøÁµÇ‰∫Ü
 };
 
 void Field_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -178,7 +178,7 @@ void Field_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	g_Texture = LoadTexture(L"asset\\texture\\grass.png");
 
-	// ÉuÉçÉbÉNÇÃçÏê¨
+	// „Éñ„É≠„ÉÉ„ÇØ„ÅÆ‰ΩúÊàê
 	for (int i = 0; i < FIELD_MAX; i++)
 	{
 		switch (Map[i].no)
@@ -198,56 +198,56 @@ void Field_Update(void)
 
 void Field_Draw(void)
 {
-	// ÉVÉFÅ[É_Å[ÇégÇ¡ÇƒÉpÉCÉvÉâÉCÉìê›íË
+	// „Ç∑„Çß„Éº„ÉÄ„Éº„Çí‰Ωø„Å£„Å¶„Éë„Ç§„Éó„É©„Ç§„É≥Ë®≠ÂÆö
 	Shader_Begin();
 
-	// ÉvÉçÉWÉFÉNÉVÉáÉìÅEÉrÉÖÅ[çsóÒ
+	// „Éó„É≠„Ç∏„Çß„ÇØ„Ç∑„Éß„É≥„Éª„Éì„É•„ÉºË°åÂàó
 	XMMATRIX View = GetCamera()->GetView();
 	XMMATRIX Projection = GetCamera()->GetProjection();
 	XMMATRIX VP = View * Projection;
 
-	// É}ÉbÉvÇÃï`âÊ
+	// „Éû„ÉÉ„Éó„ÅÆÊèèÁîª
 	int i = 0;
 	while (Map[i].no != FIELD_MAX)
 	{
-		// ÉXÉPÅ[ÉäÉìÉOçsóÒ
+		// „Çπ„Ç±„Éº„É™„É≥„Ç∞Ë°åÂàó
 		XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 
-		// ïΩçsà⁄ìÆçsóÒ
+		// Âπ≥Ë°åÁßªÂãïË°åÂàó
 		XMMATRIX TranslationMatrix = XMMatrixTranslation(
 			Map[i].pos.x, Map[i].pos.y, Map[i].pos.z);
 
-		// âÒì]çsóÒ
+		// ÂõûËª¢Ë°åÂàó
 		XMMATRIX RotationMatrix = XMMatrixRotationRollPitchYaw(
 			XMConvertToRadians(rotateBox.x),
 			XMConvertToRadians(rotateBox.y),
 			XMConvertToRadians(rotateBox.z));
 
-		// ÉÇÉfÉãçsóÒ
+		// „É¢„Éá„É´Ë°åÂàó
 		XMMATRIX Model = ScalingMatrix * RotationMatrix * TranslationMatrix;
 
-		// ïœä∑çsóÒ(WVP)
+		// Â§âÊèõË°åÂàó(WVP)
 		XMMATRIX WVP = Model * VP; // (W * V * Projection)
 
-		// ÉVÉFÅ[É_Å[Ç…ïœä∑çsóÒÇÉZÉbÉg
+		// „Ç∑„Çß„Éº„ÉÄ„Éº„Å´Â§âÊèõË°åÂàó„Çí„Çª„ÉÉ„Éà
 		Shader_SetWorldMatrix(Model);
 		Shader_SetMatrix(WVP);
 
-		// ÉeÉNÉXÉ`ÉÉ
+		// „ÉÜ„ÇØ„Çπ„ÉÅ„É£
 		g_pContext->PSSetShaderResources(0, 1, &g_Texture);
 
-		// í∏ì_ÉoÉbÉtÉ@
-		UINT stride = sizeof(Vertex3D); // 1å¬ï™ÇÃÉfÅ[É^ÉTÉCÉY
+		// È†ÇÁÇπ„Éê„ÉÉ„Éï„Ç°
+		UINT stride = sizeof(Vertex3D); // 1ÂÄãÂàÜ„ÅÆ„Éá„Éº„Çø„Çµ„Ç§„Ç∫
 		UINT offset = 0;
 		g_pContext->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
 
-		// ÉCÉìÉfÉbÉNÉXÉoÉbÉtÉ@
+		// „Ç§„É≥„Éá„ÉÉ„ÇØ„Çπ„Éê„ÉÉ„Éï„Ç°
 		g_pContext->IASetIndexBuffer(g_IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-		// ÉvÉäÉ~ÉeÉBÉuÉgÉ|ÉçÉW
+		// „Éó„É™„Éü„ÉÜ„Ç£„Éñ„Éà„Éù„É≠„Ç∏
 		g_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// ï`âÊ
+		// ÊèèÁîª
 		g_pContext->DrawIndexed(6 * 6, 0, 0);
 
 		i++;

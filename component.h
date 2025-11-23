@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <directxmath.h>
 using namespace DirectX;
@@ -53,16 +53,16 @@ public:
 	}
 };
 
-// component.h ‚É’Ç‰Á
+// component.h ã«è¿½åŠ 
 enum class CollisionFace
 {
     NONE = 0,
-    LEFT,      // -X–Ê
-    RIGHT,     // +X–Ê
-    BOTTOM,    // -Y–Ê
-    TOP,       // +Y–Ê
-    BACK,      // -Z–Ê
-    FRONT      // +Z–Ê
+    LEFT,      // -Xé¢
+    RIGHT,     // +Xé¢
+    BOTTOM,    // -Yé¢
+    TOP,       // +Yé¢
+    BACK,      // -Zé¢
+    FRONT      // +Zé¢
 };
 
 struct CollisionResult
@@ -74,7 +74,7 @@ struct CollisionResult
     CollisionResult() : isColliding(false), face(CollisionFace::NONE), penetrationDepth(0.0f) {}
 };
 
-//“–‚½‚è”»’è
+//å½“ãŸã‚Šåˆ¤å®š
 class BoxCollider
 {
 protected:
@@ -92,7 +92,7 @@ public:
     {
     }
 
-    // Õ“Ë”»’è‚ÆˆÊ’u•â³
+    // è¡çªåˆ¤å®šã¨ä½ç½®è£œæ­£
     CollisionResult CheckCollisionAndResolve(Transform& myTransform,
         const BoxCollider& other,
         const Transform& otherTransform)
@@ -103,7 +103,7 @@ public:
             return result;
         }
 
-        // ŠeBoxCollider‚Ì’†SˆÊ’u‚ğŒvZ
+        // å„BoxColliderã®ä¸­å¿ƒä½ç½®ã‚’è¨ˆç®—
         XMFLOAT3 myCenter = XMFLOAT3(
             myTransform.GetPos().x + m_Offset.x,
             myTransform.GetPos().y + m_Offset.y,
@@ -116,27 +116,27 @@ public:
             otherTransform.GetPos().z + other.m_Offset.z
         );
 
-        // Še²‚Ì‹——£‚ğŒvZ
+        // å„è»¸ã®è·é›¢ã‚’è¨ˆç®—
         float dx = otherCenter.x - myCenter.x;
         float dy = otherCenter.y - myCenter.y;
         float dz = otherCenter.z - myCenter.z;
 
-        // Še²‚Ìƒn[ƒtƒTƒCƒY‚Ì‡Œv
+        // å„è»¸ã®ãƒãƒ¼ãƒ•ã‚µã‚¤ã‚ºã®åˆè¨ˆ
         float halfWidthSum = (m_Size.x + other.m_Size.x) / 2.0f;
         float halfHeightSum = (m_Size.y + other.m_Size.y) / 2.0f;
         float halfDepthSum = (m_Size.z + other.m_Size.z) / 2.0f;
 
-        // Še²‚Å‚ÌN“ü[“x‚ğŒvZ
+        // å„è»¸ã§ã®ä¾µå…¥æ·±åº¦ã‚’è¨ˆç®—
         float overlapX = halfWidthSum - fabsf(dx);
         float overlapY = halfHeightSum - fabsf(dy);
         float overlapZ = halfDepthSum - fabsf(dz);
 
-        // ‚·‚×‚Ä‚Ì²‚Åd‚È‚è‚ª‚ ‚é‚©Šm”F
+        // ã™ã¹ã¦ã®è»¸ã§é‡ãªã‚ŠãŒã‚ã‚‹ã‹ç¢ºèª
         if (overlapX > 0 && overlapY > 0 && overlapZ > 0)
         {
             result.isColliding = true;
 
-            // Å¬‚Ìd‚È‚èiN“ü[“xj‚ğ‚Â²‚ªÕ“Ë–Ê‚ğŒˆ’è
+            // æœ€å°ã®é‡ãªã‚Šï¼ˆä¾µå…¥æ·±åº¦ï¼‰ã‚’æŒã¤è»¸ãŒè¡çªé¢ã‚’æ±ºå®š
             float minOverlap = overlapX;
             CollisionFace face = (dx > 0) ? CollisionFace::RIGHT : CollisionFace::LEFT;
             int axis = 0; // 0=X, 1=Y, 2=Z
@@ -158,42 +158,42 @@ public:
             result.face = face;
             result.penetrationDepth = minOverlap;
 
-            // IsTrigger‚ªfalse‚È‚çˆÊ’u‚ğ•â³‚µ‚ÄŠÑ’Ê‚ğ–h‚®
+            // IsTriggerãŒfalseãªã‚‰ä½ç½®ã‚’è£œæ­£ã—ã¦è²«é€šã‚’é˜²ã
             if (!m_IsTrigger && !other.m_IsTrigger)
             {
                 XMFLOAT3 currentPos = myTransform.GetPos();
 
                 switch (axis)
                 {
-                case 0: // X²‚ÅÕ“Ë
+                case 0: // Xè»¸ã§è¡çª
                     if (dx > 0) {
-                        // ‰E‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚Å¶‚É‰Ÿ‚µ–ß‚·
+                        // å³å´ã«è¡çªã—ãŸã®ã§å·¦ã«æŠ¼ã—æˆ»ã™
                         currentPos.x -= minOverlap;
                     }
                     else {
-                        // ¶‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚Å‰E‚É‰Ÿ‚µ–ß‚·
+                        // å·¦å´ã«è¡çªã—ãŸã®ã§å³ã«æŠ¼ã—æˆ»ã™
                         currentPos.x += minOverlap;
                     }
                     break;
 
-                case 1: // Y²‚ÅÕ“Ë
+                case 1: // Yè»¸ã§è¡çª
                     if (dy > 0) {
-                        // ã‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚Å‰º‚É‰Ÿ‚µ–ß‚·
+                        // ä¸Šå´ã«è¡çªã—ãŸã®ã§ä¸‹ã«æŠ¼ã—æˆ»ã™
                         currentPos.y -= minOverlap;
                     }
                     else {
-                        // ‰º‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚Åã‚É‰Ÿ‚µ–ß‚·
+                        // ä¸‹å´ã«è¡çªã—ãŸã®ã§ä¸Šã«æŠ¼ã—æˆ»ã™
                         currentPos.y += minOverlap;
                     }
                     break;
 
-                case 2: // Z²‚ÅÕ“Ë
+                case 2: // Zè»¸ã§è¡çª
                     if (dz > 0) {
-                        // ‘O‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚ÅŒã‚ë‚É‰Ÿ‚µ–ß‚·
+                        // å‰å´ã«è¡çªã—ãŸã®ã§å¾Œã‚ã«æŠ¼ã—æˆ»ã™
                         currentPos.z -= minOverlap;
                     }
                     else {
-                        // Œã‚ë‘¤‚ÉÕ“Ë‚µ‚½‚Ì‚Å‘O‚É‰Ÿ‚µ–ß‚·
+                        // å¾Œã‚å´ã«è¡çªã—ãŸã®ã§å‰ã«æŠ¼ã—æˆ»ã™
                         currentPos.z += minOverlap;
                     }
                     break;
@@ -206,12 +206,12 @@ public:
         return result;
     }
 
-    // “Ç‚İæ‚èê—p”Åiconstƒo[ƒWƒ‡ƒ“j
+    // èª­ã¿å–ã‚Šå°‚ç”¨ç‰ˆï¼ˆconstãƒãƒ¼ã‚¸ãƒ§ãƒ³ï¼‰
     CollisionResult CheckCollisionDetailed(const Transform& myTransform,
         const BoxCollider& other,
         const Transform& otherTransform) const
     {
-        // ˆÊ’u•â³‚È‚µ‚Ì”»’è‚Ì‚İiŠù‘¶‚ÌƒR[ƒhj
+        // ä½ç½®è£œæ­£ãªã—ã®åˆ¤å®šã®ã¿ï¼ˆæ—¢å­˜ã®ã‚³ãƒ¼ãƒ‰ï¼‰
         CollisionResult result;
 
         if (!m_Active || !other.m_Active) {

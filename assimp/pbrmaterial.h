@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -87,3 +87,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_MATKEY_GLTF_TEXTURE_TEXCOORD(type, N) AI_MATKEY_UVWSRC(type, N)
 
 #endif //!!AI_PBRMATERIAL_H_INC
+

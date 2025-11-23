@@ -1,4 +1,4 @@
-#include "texture.h"
+ï»¿#include "texture.h"
 
 ID3D11ShaderResourceView* LoadTexture(const wchar_t* texpass)
 {
@@ -8,7 +8,7 @@ ID3D11ShaderResourceView* LoadTexture(const wchar_t* texpass)
 
 	LoadFromWICFile(texpass, WIC_FLAGS_NONE, &metadata, image);
 	CreateShaderResourceView(Direct3D_GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &g_Texture);
-	assert(g_Texture);		//“Ç‚İ‚İ¸”s‚Éƒ_ƒCƒAƒƒO‚ğ•\¦
+	assert(g_Texture);		//èª­ã¿è¾¼ã¿å¤±æ•—æ™‚ã«ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
 
 	return g_Texture;
 }

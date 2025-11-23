@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 enum SCENE {
 	SCENE_TITLE = 0,
@@ -14,3 +14,4 @@ void Finalize(void);
 
 void SetScene(SCENE id);
 SCENE GetScene(void);
+

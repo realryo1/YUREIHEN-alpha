@@ -1,4 +1,4 @@
-#include "scene.h"
+﻿#include "scene.h"
 #include "game.h"
 #include "direct3d.h"
 #include "keyboard.h"
@@ -83,3 +83,4 @@ SCENE GetScene(void)
 {
 	return scene;
 }
+

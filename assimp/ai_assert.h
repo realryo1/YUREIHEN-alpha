@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -72,3 +72,4 @@ ASSIMP_API void aiAssertViolation(const char* failedExpression, const char* file
 #endif // ASSIMP_BUILD_DEBUG
 
 #endif // AI_ASSERT_H_INC
+

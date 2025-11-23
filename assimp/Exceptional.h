@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -180,3 +180,4 @@ struct ExceptionSwallower<void> {
     }
 
 #endif // AI_INCLUDED_EXCEPTIONAL_H
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -153,3 +153,4 @@ protected:
 } // end of namespace Assimp
 
 #endif // AI_SPATIALSORT_H_INC
+

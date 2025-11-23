@@ -1,6 +1,6 @@
-/*==============================================================================
+Ôªø/*==============================================================================
 
-   Direct3DÇÃèâä˙âªä÷òA [direct3d.cpp]
+   Direct3D„ÅÆÂàùÊúüÂåñÈñ¢ÈÄ£ [direct3d.cpp]
 --------------------------------------------------------------------------------
 
 ==============================================================================*/
@@ -8,23 +8,23 @@
 #include "direct3d.h"
 #include "debug_ostream.h"
 
-#pragma comment(lib, "d3d11.lib")//DirectXÇÃÉvÉçÉOÉâÉÄÇí«â¡Ç∑ÇÈ
+#pragma comment(lib, "d3d11.lib")//DirectX„ÅÆ„Éó„É≠„Ç∞„É©„É†„ÇíËøΩÂä†„Åô„Çã
 // #pragma comment(lib, "dxgi.lib")
 
-/* äeéÌÉCÉìÉ^Å[ÉtÉFÅ[ÉX */
+/* ÂêÑÁ®Æ„Ç§„É≥„Çø„Éº„Éï„Çß„Éº„Çπ */
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pDeviceContext = nullptr;
 static IDXGISwapChain* g_pSwapChain = nullptr;
 
-/* ÉoÉbÉNÉoÉbÉtÉ@ä÷òA */
+/* „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°Èñ¢ÈÄ£ */
 static ID3D11RenderTargetView* g_pRenderTargetView = nullptr;
 static ID3D11Texture2D* g_pDepthStencilBuffer = nullptr;
 static ID3D11DepthStencilView* g_pDepthStencilView = nullptr;
 static D3D11_TEXTURE2D_DESC g_BackBufferDesc{};
-static D3D11_VIEWPORT g_Viewport{};////////////////í«â¡
+static D3D11_VIEWPORT g_Viewport{};////////////////ËøΩÂä†
 
-static bool configureBackBuffer(); // ÉoÉbÉNÉoÉbÉtÉ@ÇÃê›íËÅEê∂ê¨
-static void releaseBackBuffer(); // ÉoÉbÉNÉoÉbÉtÉ@ÇÃâï˙
+static bool configureBackBuffer(); // „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆË®≠ÂÆö„ÉªÁîüÊàê
+static void releaseBackBuffer(); // „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆËß£Êîæ
 
 
 static float	bFactor[4] = { 0.0f,0.0f,0.0f,0.0f };
@@ -37,29 +37,29 @@ static ID3D11DepthStencilState* g_DepthStateDisable;
 
 bool Direct3D_Initialize(HWND hWnd)
 {
-    /* ÉfÉoÉCÉXÅAÉXÉèÉbÉvÉ`ÉFÅ[ÉìÅAÉRÉìÉeÉLÉXÉgê∂ê¨ */
+    /* „Éá„Éê„Ç§„Çπ„ÄÅ„Çπ„ÉØ„ÉÉ„Éó„ÉÅ„Çß„Éº„É≥„ÄÅ„Ç≥„É≥„ÉÜ„Ç≠„Çπ„ÉàÁîüÊàê */
     DXGI_SWAP_CHAIN_DESC swap_chain_desc{};
     swap_chain_desc.Windowed = TRUE;
     swap_chain_desc.BufferCount = 2;
     // swap_chain_desc.BufferDesc.Width = 0;
     // swap_chain_desc.BufferDesc.Height = 0;
-	// ÅÀ ÉEÉBÉìÉhÉEÉTÉCÉYÇ…çáÇÌÇπÇƒé©ìÆìIÇ…ê›íËÇ≥ÇÍÇÈ
+	// ‚áí „Ç¶„Ç£„É≥„Éâ„Ç¶„Çµ„Ç§„Ç∫„Å´Âêà„Çè„Åõ„Å¶Ëá™ÂãïÁöÑ„Å´Ë®≠ÂÆö„Åï„Çå„Çã
     swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swap_chain_desc.SampleDesc.Count = 1;
     swap_chain_desc.SampleDesc.Quality = 0;
-    swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;//0Ç…ÇµÇƒÇ›ÇÈ
+    swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;//0„Å´„Åó„Å¶„Åø„Çã
     swap_chain_desc.OutputWindow = hWnd;
 
 	/*
 	IDXGIFactory1* pFactory;
 	CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
 	IDXGIAdapter1* pAdapter;
-	pFactory->EnumAdapters1(1, &pAdapter); // ÉZÉJÉìÉ_ÉäÉAÉ_ÉvÉ^ÇéÊìæ
+	pFactory->EnumAdapters1(1, &pAdapter); // „Çª„Ç´„É≥„ÉÄ„É™„Ç¢„ÉÄ„Éó„Çø„ÇíÂèñÂæó
 	pFactory->Release();
 	DXGI_ADAPTER_DESC1 desc;
-	pAdapter->GetDesc1(&desc); // ÉAÉ_ÉvÉ^ÇÃèÓïÒÇéÊìæÇµÇƒämîFÇµÇΩÇ¢èÍçá
-	pAdapter->Release(); // D3D11CreateDeviceAndSwapChain()ÇÃëÊÇPà¯êîÇ…ìnÇµÇƒóòópÇµèIÇÌÇ¡ÇΩÇÁâï˙Ç∑ÇÈ
+	pAdapter->GetDesc1(&desc); // „Ç¢„ÉÄ„Éó„Çø„ÅÆÊÉÖÂ†±„ÇíÂèñÂæó„Åó„Å¶Á¢∫Ë™ç„Åó„Åü„ÅÑÂ†¥Âêà
+	pAdapter->Release(); // D3D11CreateDeviceAndSwapChain()„ÅÆÁ¨¨ÔºëÂºïÊï∞„Å´Ê∏°„Åó„Å¶Âà©Áî®„ÅóÁµÇ„Çè„Å£„Åü„ÇâËß£Êîæ„Åô„Çã
 	*/
 
 	UINT device_flags = 0;
@@ -90,22 +90,22 @@ bool Direct3D_Initialize(HWND hWnd)
         &g_pDeviceContext);
 
     if (FAILED(hr)) {
-		MessageBox(hWnd, "Direct3DÇÃèâä˙âªÇ…é∏îsÇµÇ‹ÇµÇΩ", "ÉGÉâÅ[", MB_OK);
+		MessageBox(hWnd, "Direct3D„ÅÆÂàùÊúüÂåñ„Å´Â§±Êïó„Åó„Åæ„Åó„Åü", "„Ç®„É©„Éº", MB_OK);
         return false;
     }
 
 	if (!configureBackBuffer()) {
-		MessageBox(hWnd, "ÉoÉbÉNÉoÉbÉtÉ@ÇÃê›íËÇ…é∏îsÇµÇ‹ÇµÇΩ", "ÉGÉâÅ[", MB_OK);
+		MessageBox(hWnd, "„Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆË®≠ÂÆö„Å´Â§±Êïó„Åó„Åæ„Åó„Åü", "„Ç®„É©„Éº", MB_OK);
 		return false;
 	}
 
-	// ÉTÉìÉvÉâÅ[ÉXÉeÅ[Égê›íË
+	// „Çµ„É≥„Éó„É©„Éº„Çπ„ÉÜ„Éº„ÉàË®≠ÂÆö
 	D3D11_SAMPLER_DESC samplerDesc;
 	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;//ÇøÇÂÇ¡Ç∆Ç¢Ç¢ÉtÉBÉãÉ^Å[Ç…Ç∑ÇÈ
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;//â°ÇÃç¿ïWîÕàÕäOÇÕâÊëúåJÇËï‘Çµ
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;//ècÇÃç¿ïWîÕàÕäOÇÕâÊëúåJÇËï‘Çµ
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;//ñ¢égóp
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;//„Å°„Çá„Å£„Å®„ÅÑ„ÅÑ„Éï„Ç£„É´„Çø„Éº„Å´„Åô„Çã
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;//Ê®™„ÅÆÂ∫ßÊ®ôÁØÑÂõ≤Â§ñ„ÅØÁîªÂÉèÁπ∞„ÇäËøî„Åó
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;//Á∏¶„ÅÆÂ∫ßÊ®ôÁØÑÂõ≤Â§ñ„ÅØÁîªÂÉèÁπ∞„ÇäËøî„Åó
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;//Êú™‰ΩøÁî®
 	samplerDesc.MipLODBias = 0;
 	samplerDesc.MaxAnisotropy = 16;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
@@ -113,12 +113,12 @@ bool Direct3D_Initialize(HWND hWnd)
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	ID3D11SamplerState* samplerState = NULL;
 	g_pDevice->CreateSamplerState(&samplerDesc, &samplerState);
-	//ÉTÉìÉvÉâÅ[ÇÉVÉFÅ[É_Å[Ç÷ÉZÉbÉg
+	//„Çµ„É≥„Éó„É©„Éº„Çí„Ç∑„Çß„Éº„ÉÄ„Éº„Å∏„Çª„ÉÉ„Éà
 	g_pDeviceContext->PSSetSamplers(0, 1, &samplerState);
 
 
 
-	// ÉuÉåÉìÉhÉXÉeÅ[Égê›íË
+	// „Éñ„É¨„É≥„Éâ„Çπ„ÉÜ„Éº„ÉàË®≠ÂÆö
 	D3D11_BLEND_DESC blendDesc;
 	ZeroMemory(&blendDesc, sizeof(blendDesc));
 	blendDesc.AlphaToCoverageEnable = FALSE;
@@ -132,43 +132,43 @@ bool Direct3D_Initialize(HWND hWnd)
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	//ÉuÉåÉìÉhñ≥å¯
-	blendDesc.RenderTarget[0].BlendEnable = FALSE;	//ÉuÉåÉìÉhñ≥å¯
+	//„Éñ„É¨„É≥„ÉâÁÑ°Âäπ
+	blendDesc.RenderTarget[0].BlendEnable = FALSE;	//„Éñ„É¨„É≥„ÉâÁÑ°Âäπ
 	g_pDevice->CreateBlendState(&blendDesc, &bState[BLENDSTATE_NONE]);
 
-	//ÉøÉuÉåÉìÉh
-	blendDesc.RenderTarget[0].BlendEnable = TRUE;	//ÉuÉåÉìÉhóLå¯
-	g_pDevice->CreateBlendState(&blendDesc, &bState[BLENDSTATE_ALFA]);//<<ALPHAÅI
+	//Œ±„Éñ„É¨„É≥„Éâ
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;	//„Éñ„É¨„É≥„ÉâÊúâÂäπ
+	g_pDevice->CreateBlendState(&blendDesc, &bState[BLENDSTATE_ALFA]);//<<ALPHAÔºÅ
 
-	//â¡éZçáê¨
+	//Âä†ÁÆóÂêàÊàê
 	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	g_pDevice->CreateBlendState(&blendDesc, &bState[BLENDSTATE_ADD]);
 
-	//å∏éZçáê¨
+	//Ê∏õÁÆóÂêàÊàê
 	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_SUBTRACT;//<<<<ï\é¶êF = îwåi - É|ÉäÉSÉì
-//	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;//<<<<ï\é¶êF = îwåi - É|ÉäÉSÉì
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_SUBTRACT;//<<<<Ë°®Á§∫Ëâ≤ = ËÉåÊôØ - „Éù„É™„Ç¥„É≥
+//	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;//<<<<Ë°®Á§∫Ëâ≤ = ËÉåÊôØ - „Éù„É™„Ç¥„É≥
 	g_pDevice->CreateBlendState(&blendDesc, &bState[BLENDSTATE_SUB]);
 
-	SetBlendState(BLENDSTATE_ALFA);//ÉfÉtÉHÉãÉgê›íË
+	SetBlendState(BLENDSTATE_ALFA);//„Éá„Éï„Ç©„É´„ÉàË®≠ÂÆö
 
 
-	// ê[ìxÉXÉeÉìÉVÉãÉXÉeÅ[Égê›íË
+	// Ê∑±Â∫¶„Çπ„ÉÜ„É≥„Ç∑„É´„Çπ„ÉÜ„Éº„ÉàË®≠ÂÆö
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 	depthStencilDesc.DepthEnable = TRUE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	depthStencilDesc.StencilEnable = FALSE;
-	g_pDevice->CreateDepthStencilState(&depthStencilDesc, &g_DepthStateEnable);//ê[ìxóLå¯ÉXÉeÅ[Ég
+	g_pDevice->CreateDepthStencilState(&depthStencilDesc, &g_DepthStateEnable);//Ê∑±Â∫¶ÊúâÂäπ„Çπ„ÉÜ„Éº„Éà
 	depthStencilDesc.DepthEnable = FALSE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	g_pDevice->CreateDepthStencilState(&depthStencilDesc, &g_DepthStateDisable);//ê[ìxñ≥å¯ÉXÉeÅ[Ég
+	g_pDevice->CreateDepthStencilState(&depthStencilDesc, &g_DepthStateDisable);//Ê∑±Â∫¶ÁÑ°Âäπ„Çπ„ÉÜ„Éº„Éà
 
-	g_pDeviceContext->OMSetDepthStencilState(g_DepthStateDisable, NULL); //ÉfÉtÉHÉãÉgÅ@ê[ìxñ≥å¯
+	g_pDeviceContext->OMSetDepthStencilState(g_DepthStateDisable, NULL); //„Éá„Éï„Ç©„É´„Éà„ÄÄÊ∑±Â∫¶ÁÑ°Âäπ
 
 
     return true;
@@ -178,11 +178,11 @@ void	SetDepthTest(bool flg)
 {
 	if (flg == true)
 	{
-		g_pDeviceContext->OMSetDepthStencilState(g_DepthStateEnable, NULL); //ÉfÉtÉHÉãÉgÅ@ê[ìxñ≥å¯
+		g_pDeviceContext->OMSetDepthStencilState(g_DepthStateEnable, NULL); //„Éá„Éï„Ç©„É´„Éà„ÄÄÊ∑±Â∫¶ÁÑ°Âäπ
 	}
 	else
 	{
-		g_pDeviceContext->OMSetDepthStencilState(g_DepthStateDisable, NULL); //ÉfÉtÉHÉãÉgÅ@ê[ìxñ≥å¯
+		g_pDeviceContext->OMSetDepthStencilState(g_DepthStateDisable, NULL); //„Éá„Éï„Ç©„É´„Éà„ÄÄÊ∑±Â∫¶ÁÑ°Âäπ
 	}
 
 
@@ -214,7 +214,7 @@ void Direct3D_Clear()
 	g_pDeviceContext->ClearRenderTargetView(g_pRenderTargetView, clear_color);
 	g_pDeviceContext->ClearDepthStencilView(g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	// ÉåÉìÉ_Å[É^Å[ÉQÉbÉgÉrÉÖÅ[Ç∆ÉfÉvÉXÉXÉeÉìÉVÉãÉrÉÖÅ[ÇÃê›íË/////////////í«â¡
+	// „É¨„É≥„ÉÄ„Éº„Çø„Éº„Ç≤„ÉÉ„Éà„Éì„É•„Éº„Å®„Éá„Éó„Çπ„Çπ„ÉÜ„É≥„Ç∑„É´„Éì„É•„Éº„ÅÆË®≠ÂÆö/////////////ËøΩÂä†
 	g_pDeviceContext->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
 
 
@@ -222,11 +222,11 @@ void Direct3D_Clear()
 
 void Direct3D_Present()
 {
-	// ÉXÉèÉbÉvÉ`ÉFÅ[ÉìÇÃï\é¶
+	// „Çπ„ÉØ„ÉÉ„Éó„ÉÅ„Çß„Éº„É≥„ÅÆË°®Á§∫
 	g_pSwapChain->Present(1, 0);
 }
 
-//////////////////////////////////////////////í«â¡
+//////////////////////////////////////////////ËøΩÂä†
 
 ID3D11Device* Direct3D_GetDevice()
 {
@@ -260,29 +260,29 @@ bool configureBackBuffer()
 
     ID3D11Texture2D* back_buffer_pointer = nullptr;
 
-	// ÉoÉbÉNÉoÉbÉtÉ@ÇÃéÊìæ
+	// „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆÂèñÂæó
 	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&back_buffer_pointer);
 
     if (FAILED(hr)) {
-		hal::dout << "ÉoÉbÉNÉoÉbÉtÉ@ÇÃéÊìæÇ…é∏îsÇµÇ‹ÇµÇΩ" << std::endl;
+		hal::dout << "„Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆÂèñÂæó„Å´Â§±Êïó„Åó„Åæ„Åó„Åü" << std::endl;
         return false;
     }
 
-	// ÉoÉbÉNÉoÉbÉtÉ@ÇÃÉåÉìÉ_Å[É^Å[ÉQÉbÉgÉrÉÖÅ[ÇÃê∂ê¨
+	// „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆ„É¨„É≥„ÉÄ„Éº„Çø„Éº„Ç≤„ÉÉ„Éà„Éì„É•„Éº„ÅÆÁîüÊàê
 	hr = g_pDevice->CreateRenderTargetView(back_buffer_pointer, nullptr, &g_pRenderTargetView);
 
     if (FAILED(hr)) {
         back_buffer_pointer->Release();
-        hal::dout << "ÉoÉbÉNÉoÉbÉtÉ@ÇÃÉåÉìÉ_Å[É^Å[ÉQÉbÉgÉrÉÖÅ[ÇÃê∂ê¨Ç…é∏îsÇµÇ‹ÇµÇΩ" << std::endl;
+        hal::dout << "„Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆ„É¨„É≥„ÉÄ„Éº„Çø„Éº„Ç≤„ÉÉ„Éà„Éì„É•„Éº„ÅÆÁîüÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü" << std::endl;
         return false;
     }
 
-	// ÉoÉbÉNÉoÉbÉtÉ@ÇÃèÛë‘ÅièÓïÒÅjÇéÊìæ
+	// „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆÁä∂ÊÖãÔºàÊÉÖÂ†±Ôºâ„ÇíÂèñÂæó
     back_buffer_pointer->GetDesc(&g_BackBufferDesc);
 
-	back_buffer_pointer->Release(); // ÉoÉbÉNÉoÉbÉtÉ@ÇÃÉ|ÉCÉìÉ^ÇÕïsóvÇ»ÇÃÇ≈âï˙
+	back_buffer_pointer->Release(); // „Éê„ÉÉ„ÇØ„Éê„ÉÉ„Éï„Ç°„ÅÆ„Éù„Ç§„É≥„Çø„ÅØ‰∏çË¶Å„Å™„ÅÆ„ÅßËß£Êîæ
 
-	// ÉfÉvÉXÉXÉeÉìÉVÉãÉoÉbÉtÉ@ÇÃê∂ê¨
+	// „Éá„Éó„Çπ„Çπ„ÉÜ„É≥„Ç∑„É´„Éê„ÉÉ„Éï„Ç°„ÅÆÁîüÊàê
 	D3D11_TEXTURE2D_DESC depth_stencil_desc{};
 	depth_stencil_desc.Width = g_BackBufferDesc.Width;
 	depth_stencil_desc.Height = g_BackBufferDesc.Height;
@@ -298,11 +298,11 @@ bool configureBackBuffer()
 	hr = g_pDevice->CreateTexture2D(&depth_stencil_desc, nullptr, &g_pDepthStencilBuffer);
 
 	if (FAILED(hr)) {
-		hal::dout << "ÉfÉvÉXÉXÉeÉìÉVÉãÉoÉbÉtÉ@ÇÃê∂ê¨Ç…é∏îsÇµÇ‹ÇµÇΩ" << std::endl;
+		hal::dout << "„Éá„Éó„Çπ„Çπ„ÉÜ„É≥„Ç∑„É´„Éê„ÉÉ„Éï„Ç°„ÅÆÁîüÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü" << std::endl;
 		return false;
 	}
 
-	// ÉfÉvÉXÉXÉeÉìÉVÉãÉrÉÖÅ[ÇÃê∂ê¨
+	// „Éá„Éó„Çπ„Çπ„ÉÜ„É≥„Ç∑„É´„Éì„É•„Éº„ÅÆÁîüÊàê
 	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc{};
 	depth_stencil_view_desc.Format = depth_stencil_desc.Format;
 	depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -311,20 +311,20 @@ bool configureBackBuffer()
 	hr = g_pDevice->CreateDepthStencilView(g_pDepthStencilBuffer, &depth_stencil_view_desc, &g_pDepthStencilView);
 
 	if (FAILED(hr)) {
-		hal::dout << "ÉfÉvÉXÉXÉeÉìÉVÉãÉrÉÖÅ[ÇÃê∂ê¨Ç…é∏îsÇµÇ‹ÇµÇΩ" << std::endl;
+		hal::dout << "„Éá„Éó„Çπ„Çπ„ÉÜ„É≥„Ç∑„É´„Éì„É•„Éº„ÅÆÁîüÊàê„Å´Â§±Êïó„Åó„Åæ„Åó„Åü" << std::endl;
 		return false;
 	}
 
 
-	// ÉrÉÖÅ[É|Å[ÉgÇÃê›íË/////////////////////í«â¡
+	// „Éì„É•„Éº„Éù„Éº„Éà„ÅÆË®≠ÂÆö/////////////////////ËøΩÂä†
 	g_Viewport.TopLeftX = 0.0f;
 	g_Viewport.TopLeftY = 0.0f;
 	g_Viewport.Width = static_cast<FLOAT>(g_BackBufferDesc.Width);
 	g_Viewport.Height = static_cast<FLOAT>(g_BackBufferDesc.Height);
 	g_Viewport.MinDepth = 0.0f;
 	g_Viewport.MaxDepth = 1.0f;
-	g_pDeviceContext->RSSetViewports(1, &g_Viewport); // ÉrÉÖÅ[É|Å[ÉgÇÃê›íË
-	////////////////////////////////////////////í«â¡
+	g_pDeviceContext->RSSetViewports(1, &g_Viewport); // „Éì„É•„Éº„Éù„Éº„Éà„ÅÆË®≠ÂÆö
+	////////////////////////////////////////////ËøΩÂä†
 
 
     return true;
@@ -349,10 +349,11 @@ void releaseBackBuffer()
 }
 
 
-//à»â∫ÇÃä÷êîÇàÍî‘â∫Ç÷í«â¡
+//‰ª•‰∏ã„ÅÆÈñ¢Êï∞„Çí‰∏ÄÁï™‰∏ã„Å∏ËøΩÂä†
 void SetBlendState(BLENDSTATE blend)
 {
 
 	g_pDeviceContext->OMSetBlendState(bState[blend], bFactor, 0xffffffff);
 
 }
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -107,3 +107,4 @@ private:
 };
 }
 #endif // !! AI_NULLLOGGER_H_INCLUDED
+

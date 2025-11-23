@@ -1,6 +1,6 @@
-/*==============================================================================
+ï»¿/*==============================================================================
 
-   ƒ|ƒŠƒSƒ“•`‰æ [game.cpp]
+   ãƒãƒªã‚´ãƒ³æç”» [game.cpp]
 
 ==============================================================================*/
 #include <d3d11.h>
@@ -22,17 +22,17 @@ Light* MainLight;
 
 void Game_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	// ƒfƒoƒCƒX‚ÆƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚Ìƒ`ƒFƒbƒN
+	// ãƒ‡ãƒã‚¤ã‚¹ã¨ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ãƒã‚§ãƒƒã‚¯
 	if (!pDevice || !pContext) {
-		hal::dout << "Game_Initialize() : —^‚¦‚ç‚ê‚½ƒfƒoƒCƒX‚©ƒRƒ“ƒeƒLƒXƒg‚ª•s³‚Å‚·" << std::endl;
+		hal::dout << "Game_Initialize() : ä¸ãˆã‚‰ã‚ŒãŸãƒ‡ãƒã‚¤ã‚¹ã‹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒä¸æ­£ã§ã™" << std::endl;
 		return;
 	}
 
 	MainLight = new Light
 	(TRUE,
-		XMFLOAT4(0.0f, -10.0f, 0.0f, 1.0f), //êŠ
-		XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),	//Œõ‚ÌF
-		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f)	//ŠÂ‹«Œõ
+		XMFLOAT4(0.0f, -10.0f, 0.0f, 1.0f), //å ´æ‰€
+		XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f),	//å…‰ã®è‰²
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f)	//ç’°å¢ƒå…‰
 	);
 
 	Camera_Initialize();
@@ -52,7 +52,7 @@ void Game_Draw(void)
 	MainLight->SetEnable(true);
 	Shader_SetLight(MainLight);
 
-	//3D•`‰æ‚È‚çí‚É—LŒø‚É‚·‚é
+	//3Dæç”»ãªã‚‰å¸¸ã«æœ‰åŠ¹ã«ã™ã‚‹
 	SetDepthTest(true);
 
 	Camera_Draw();
@@ -62,7 +62,7 @@ void Game_Draw(void)
 	SetDepthTest(false);
 	MainLight->SetEnable(false);
 	Shader_SetLight(MainLight);
-	//2D•`‰æˆ—‚±‚±‚©‚ç
+	//2Dæç”»å‡¦ç†ã“ã“ã‹ã‚‰
 }
 
 void Game_Finalize(void)

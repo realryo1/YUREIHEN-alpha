@@ -1,4 +1,4 @@
-#include <directxmath.h>
+ï»¿#include <directxmath.h>
 #include "sprite.h"
 #include "box.h"
 using namespace DirectX;
@@ -7,166 +7,166 @@ using namespace DirectX;
 
 static Vertex3D Box_vdata[BOX_NUM_VERTEX] =
 {
-	//---------------‘O–Ê--------------------------------
-	{//‚O@¶ã
-		XMFLOAT3(-0.5f,0.5f,-0.5f),//’¸“_À•W
+	//---------------å‰é¢--------------------------------
+	{//ï¼ã€€å·¦ä¸Š
+		XMFLOAT3(-0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,-1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚P@‰Eã
-		XMFLOAT3(0.5f,0.5f,-0.5f),//’¸“_À•W
+	{//ï¼‘ã€€å³ä¸Š
+		XMFLOAT3(0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,-1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚Q@¶‰º
-		XMFLOAT3(-0.5f,-0.5f,-0.5f),//’¸“_À•W
+	{//ï¼’ã€€å·¦ä¸‹
+		XMFLOAT3(-0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,-1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚T@‰E‰º
-		XMFLOAT3(0.5f,-0.5f,-0.5f),//’¸“_À•W
+	{//ï¼•ã€€å³ä¸‹
+		XMFLOAT3(0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,-1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
-	//----------------------‰E‘¤–Ê------------------------
-	{//‚U@¶ã
-		XMFLOAT3(0.5f,0.5f,-0.5f),//’¸“_À•W
+	//----------------------å³å´é¢------------------------
+	{//ï¼–ã€€å·¦ä¸Š
+		XMFLOAT3(0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚V@‰Eã
-		XMFLOAT3(0.5f,0.5f,0.5f),//’¸“_À•W
+	{//ï¼—ã€€å³ä¸Š
+		XMFLOAT3(0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚W@¶‰º
-		XMFLOAT3(0.5f,-0.5f,-0.5f),//’¸“_À•W
+	{//ï¼˜ã€€å·¦ä¸‹
+		XMFLOAT3(0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚P‚P@‰E‰º
-		XMFLOAT3(0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//ï¼‘ï¼‘ã€€å³ä¸‹
+		XMFLOAT3(0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
-	//------------------------’ê–Ê------------------------
-	{//12@¶ã
-		XMFLOAT3(-0.5f,-0.5f,-0.5f),//’¸“_À•W
+	//------------------------åº•é¢------------------------
+	{//12ã€€å·¦ä¸Š
+		XMFLOAT3(-0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,-1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//13@‰Eã
-		XMFLOAT3(0.5f,-0.5f,-0.5f),//’¸“_À•W
+	{//13ã€€å³ä¸Š
+		XMFLOAT3(0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,-1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//14@¶‰º
-		XMFLOAT3(-0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//14ã€€å·¦ä¸‹
+		XMFLOAT3(-0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,-1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.75f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.75f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//17@‰E‰º
-		XMFLOAT3(0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//17ã€€å³ä¸‹
+		XMFLOAT3(0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,-1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.75f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.75f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
-	//------------------------‘Î–Ê------------------------
-	{//‚O@¶ã
-		XMFLOAT3(0.5f,0.5f,0.5f),//’¸“_À•W
+	//------------------------å¯¾é¢------------------------
+	{//ï¼ã€€å·¦ä¸Š
+		XMFLOAT3(0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚P@‰Eã
-		XMFLOAT3(-0.5f,0.5f,0.5f),//’¸“_À•W
+	{//ï¼‘ã€€å³ä¸Š
+		XMFLOAT3(-0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚Q@¶‰º
-		XMFLOAT3(0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//ï¼’ã€€å·¦ä¸‹
+		XMFLOAT3(0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚T@‰E‰º
-		XMFLOAT3(-0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//ï¼•ã€€å³ä¸‹
+		XMFLOAT3(-0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,0,1),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
-	//----------------------¶‘¤–Ê------------------------
-	{//‚U@¶ã
-		XMFLOAT3(-0.5f,0.5f,0.5f),//’¸“_À•W
+	//----------------------å·¦å´é¢------------------------
+	{//ï¼–ã€€å·¦ä¸Š
+		XMFLOAT3(-0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(-1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚V@‰Eã
-		XMFLOAT3(-0.5f,0.5f,-0.5f),//’¸“_À•W
+	{//ï¼—ã€€å³ä¸Š
+		XMFLOAT3(-0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(-1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚W@¶‰º
-		XMFLOAT3(-0.5f,-0.5f,0.5f),//’¸“_À•W
+	{//ï¼˜ã€€å·¦ä¸‹
+		XMFLOAT3(-0.5f,-0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(-1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//‚P‚P@‰E‰º
-		XMFLOAT3(-0.5f,-0.5f,-0.5f),//’¸“_À•W
+	{//ï¼‘ï¼‘ã€€å³ä¸‹
+		XMFLOAT3(-0.5f,-0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(-1,0,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.5f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.5f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
-	//------------------------“V–Ê------------------------
-	{//12@¶ã
-		XMFLOAT3(0.5f,0.5f,-0.5f),//’¸“_À•W
+	//------------------------å¤©é¢------------------------
+	{//12ã€€å·¦ä¸Š
+		XMFLOAT3(0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.0f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.0f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//13@‰Eã
-		XMFLOAT3(-0.5f,0.5f,-0.5f),//’¸“_À•W
+	{//13ã€€å³ä¸Š
+		XMFLOAT3(-0.5f,0.5f,-0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.0f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.0f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//14@¶‰º
-		XMFLOAT3(0.5f,0.5f,0.5f),//’¸“_À•W
+	{//14ã€€å·¦ä¸‹
+		XMFLOAT3(0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 		XMFLOAT3(0,1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(0.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(0.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
-	{//17@‰E‰º
-		XMFLOAT3(-0.5f,0.5f,0.5f),//’¸“_À•W
+	{//17ã€€å³ä¸‹
+		XMFLOAT3(-0.5f,0.5f,0.5f),//é ‚ç‚¹åº§æ¨™
 
 		XMFLOAT3(0,1,0),//normal
 		XMFLOAT4(1.0f,1.0f,1.0f,1.0f),//(R,G,B,A)
-		XMFLOAT2(1.0f,0.25f)//ƒeƒNƒXƒ`ƒƒÀ•W
+		XMFLOAT2(1.0f,0.25f)//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	},
 	//----------------------------------------------------
 };
 
-//1ƒ|ƒŠƒSƒ“=3’¸“_*2=1–Ê–6–Ê
+//1ãƒãƒªã‚´ãƒ³=3é ‚ç‚¹*2=1é¢ï¼Š6é¢
 static UINT  Box_idxdata[6 * 6] =
 {
 	0,1,2,2,1,3,
@@ -177,47 +177,48 @@ static UINT  Box_idxdata[6 * 6] =
 	20,21,22,22,21,23
 };
 
-// BOX‚Ìˆê‘Ì‚ðì¬‚·‚é
+// BOXã®ä¸€ä½“ã‚’ä½œæˆã™ã‚‹
 void CreateBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 	ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer)
 {
-	//’¸“_ƒoƒbƒtƒ@ì¬
+	//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DYNAMIC;
-		bd.ByteWidth = sizeof(Vertex3D) * BOX_NUM_VERTEX;//Ši”[‚Å‚«‚é’¸“_”
+		bd.ByteWidth = sizeof(Vertex3D) * BOX_NUM_VERTEX;//æ ¼ç´ã§ãã‚‹é ‚ç‚¹æ•°
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		pDevice->CreateBuffer(&bd, NULL, ppVertexBuffer);
 
-		//’¸“_ƒoƒbƒtƒ@‚ðt’¸“_ƒoƒbƒtƒ@‚ÉÝ’è
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’té ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«è¨­å®š
 		D3D11_MAPPED_SUBRESOURCE msr;
 		pContext->Map(*ppVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 		Vertex3D* vertex = (Vertex3D*)msr.pData;
-		//’¸“_ƒf[ƒ^ƒRƒs[
+		//é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ”ãƒ¼
 		CopyMemory(&vertex[0], &Box_vdata[0], sizeof(Vertex3D) * BOX_NUM_VERTEX);
-		//ƒRƒs[Š®—¹
+		//ã‚³ãƒ”ãƒ¼å®Œäº†
 		pContext->Unmap(*ppVertexBuffer, 0);
 	}
 
-	//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ì¬
+	//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DYNAMIC;
-		bd.ByteWidth = sizeof(UINT) * 6 * 6;//Ši”[‚Å‚«‚é’¸“_”
+		bd.ByteWidth = sizeof(UINT) * 6 * 6;//æ ¼ç´ã§ãã‚‹é ‚ç‚¹æ•°
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		pDevice->CreateBuffer(&bd, NULL, ppIndexBuffer);
 
-		//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚É‘‚«ž‚Ý
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã«æ›¸ãè¾¼ã¿
 		D3D11_MAPPED_SUBRESOURCE msr;
 		pContext->Map(*ppIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 		UINT* index = (UINT*)msr.pData;
 
-		//ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^ƒRƒs[
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ”ãƒ¼
 		CopyMemory(&index[0], &Box_idxdata[0], sizeof(UINT) * 6 * 6);
 		pContext->Unmap(*ppIndexBuffer, 0);
 	}
 }
+

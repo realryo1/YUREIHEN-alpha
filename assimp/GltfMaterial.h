@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -72,3 +72,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_MATKEY_GLTF_TEXTURE_STRENGTH(type, N) _AI_MATKEY_GLTF_STRENGTH_BASE, type, N
 
 #endif
+

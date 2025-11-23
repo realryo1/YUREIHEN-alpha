@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -86,3 +86,4 @@ namespace Assimp {
 }
 
 #endif // INCLUDED_ASSIMP_XML_TOOLS_H
+

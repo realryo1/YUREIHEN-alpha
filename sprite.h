@@ -1,4 +1,4 @@
-
+ï»¿
 //sprite.h
 
 #pragma once
@@ -8,24 +8,25 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
-//ƒvƒƒgƒ^ƒCƒvéŒ¾
+//ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 void		DrawSprite(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col);
 void		DrawSpriteEx(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc);
-void		InitializeSprite();	//ƒXƒvƒ‰ƒCƒg‰Šú‰»
-void		FinalizeSprite();	//ƒXƒvƒ‰ƒCƒgI—¹
+void		InitializeSprite();	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆåˆæœŸåŒ–
+void		FinalizeSprite();	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆçµ‚äº†
 void		DrawSpriteScroll(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col,
 										XMFLOAT2 texcoord);
 
 void		DrawSpriteExRotation(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc, float radian);
 
-void	DrawSprite(XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc);//s—ñg—p”Å
+void	DrawSprite(XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc);//è¡Œåˆ—ä½¿ç”¨ç‰ˆ
 
 
-// ’¸“_\‘¢‘Ì
+// é ‚ç‚¹æ§‹é€ ä½“
 struct Vertex
 {
-	XMFLOAT3 position; // ’¸“_À•W  //XMFLOAT3‚Ö•ÏX
-	XMFLOAT4 color;		//’¸“_ƒJƒ‰[iR,G,B,Aj
-	XMFLOAT2 texCoord;	//ƒeƒNƒXƒ`ƒƒÀ•W
+	XMFLOAT3 position; // é ‚ç‚¹åº§æ¨™  //XMFLOAT3ã¸å¤‰æ›´
+	XMFLOAT4 color;		//é ‚ç‚¹ã‚«ãƒ©ãƒ¼ï¼ˆR,G,B,Aï¼‰
+	XMFLOAT2 texCoord;	//ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 };
+
 

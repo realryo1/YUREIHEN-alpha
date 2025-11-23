@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -387,3 +387,4 @@ private:
 } // namespace Assimp
 
 #endif // !! AI_SCENE_COMBINER_H_INC
+

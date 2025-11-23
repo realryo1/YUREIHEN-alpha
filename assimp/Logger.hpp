@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -301,3 +301,4 @@ inline Logger::LogSeverity Logger::getLogSeverity() const {
 	Assimp::DefaultLogger::get()->info(__VA_ARGS__)
 
 #endif // !! INCLUDED_AI_LOGGER_H
+

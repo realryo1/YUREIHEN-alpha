@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -340,3 +340,4 @@ AI_FORCE_INLINE bool IOSystem::DeleteFile( const std::string &file ) {
 } //!ns Assimp
 
 #endif //AI_IOSYSTEM_H_INC
+

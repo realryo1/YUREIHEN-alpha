@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "component.h"
 
 #define BOX_NUM_VERTEX (24)

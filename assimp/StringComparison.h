@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -222,3 +222,4 @@ inline unsigned int integer_pow(unsigned int base, unsigned int power) {
 } // namespace Assimp
 
 #endif // !  AI_STRINGCOMPARISON_H_INC
+

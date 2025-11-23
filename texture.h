@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <d3d11.h>
 #include "direct3d.h"
 #include "main.h"

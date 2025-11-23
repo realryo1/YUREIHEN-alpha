@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -290,3 +290,4 @@ struct Getter<SwapEndianess,T,false> {
 } // end Assimp
 
 #endif //!! AI_BYTESWAPPER_H_INC
+

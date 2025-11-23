@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -342,3 +342,4 @@ typedef StreamReader<true, true> StreamReaderAny;
 } // end namespace Assimp
 
 #endif // !! AI_STREAMREADER_H_INCLUDED
+

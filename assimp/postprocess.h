@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -706,3 +706,4 @@ enum aiPostProcessSteps
 #endif
 
 #endif // AI_POSTPROCESS_H_INC
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -162,3 +162,4 @@ private:
 } // end namespace Assimp
 
 #endif // !! AI_SMALLVECTOR_H_INC
+

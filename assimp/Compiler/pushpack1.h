@@ -1,4 +1,4 @@
-
+﻿
 
 // ===============================================================================
 // May be included multiple times - sets structure packing to 1
@@ -41,3 +41,4 @@
 #endif
 
 #define AI_PUSHPACK_IS_DEFINED
+

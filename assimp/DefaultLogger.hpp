@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -191,3 +191,4 @@ private:
 } // Namespace Assimp
 
 #endif // !! INCLUDED_AI_DEFAULTLOGGER
+

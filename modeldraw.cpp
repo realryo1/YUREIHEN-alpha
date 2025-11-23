@@ -1,12 +1,12 @@
-#include "modeldraw.h"
+ï»¿#include "modeldraw.h"
 #include "Camera.h"
 #include "newShader.h"
 
-// ƒOƒ[ƒoƒ‹•Ï”
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 static ID3D11Device* g_pDevice = NULL;
 static ID3D11DeviceContext* g_pContext = NULL;
 
-// ƒ‚ƒfƒ‹
+// ãƒ¢ãƒ‡ãƒ«
 static MODEL* g_testModel = nullptr;
 
 void ModelDraw_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -24,37 +24,37 @@ void ModelDraw_Update(void)
 
 void ModelDraw_DrawAll(void)
 {
-	// ƒVƒF[ƒ_[‚ğg‚Á‚ÄƒpƒCƒvƒ‰ƒCƒ“İ’è
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ä½¿ã£ã¦ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³è¨­å®š
 	Shader_Begin();
 
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“Eƒrƒ…[s—ñ
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ãƒ»ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—
 	XMMATRIX View = GetCamera()->GetView();
 	XMMATRIX Projection = GetCamera()->GetProjection();
 	XMMATRIX VP = View * Projection;
 
-	// ƒXƒP[ƒŠƒ“ƒOs—ñ
+	// ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°è¡Œåˆ—
 	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 
-	// •½sˆÚ“®s—ñ
+	// å¹³è¡Œç§»å‹•è¡Œåˆ—
 	XMMATRIX TranslationMatrix = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-	// ‰ñ“]s—ñ
+	// å›è»¢è¡Œåˆ—
 	XMMATRIX RotationMatrix = XMMatrixRotationRollPitchYaw(
 		XMConvertToRadians(0.0f),
 		XMConvertToRadians(0.0f),
 		XMConvertToRadians(0.0f));
 
-	// ƒ‚ƒfƒ‹s—ñ
+	// ãƒ¢ãƒ‡ãƒ«è¡Œåˆ—
 	XMMATRIX Model_World = ScalingMatrix * RotationMatrix * TranslationMatrix;
 
-	// •ÏŠ·s—ñ(WVP)
+	// å¤‰æ›è¡Œåˆ—(WVP)
 	XMMATRIX WVP = Model_World * VP; // (W * V * Projection)
 
-	// ƒVƒF[ƒ_[‚É•ÏŠ·s—ñ‚ğƒZƒbƒg
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã«å¤‰æ›è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆ
 	Shader_SetWorldMatrix(Model_World);
 	Shader_SetMatrix(WVP);
 
-	// ƒ‚ƒfƒ‹•`‰æ
+	// ãƒ¢ãƒ‡ãƒ«æç”»
 	ModelDraw(g_testModel);
 }
 

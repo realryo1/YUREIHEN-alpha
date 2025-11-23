@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -334,3 +334,4 @@ static const ai_real ai_epsilon = (ai_real) 1e-6;
 #define AI_COUNT_OF(X) (sizeof(X) / sizeof((X)[0]))
 
 #endif // !! AI_DEFINES_H_INC
+

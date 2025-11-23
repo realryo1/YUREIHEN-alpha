@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -152,3 +152,4 @@ ASSIMP_API const C_STRUCT aiImporterDesc *aiGetImporterDesc(const char *extensio
 #endif
 
 #endif // AI_IMPORTER_DESC_H_INC
+

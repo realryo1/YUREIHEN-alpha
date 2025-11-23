@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -271,3 +271,4 @@ AI_FORCE_INLINE void LineSplitter::swallow_next_increment() {
 } // Namespace Assimp
 
 #endif // INCLUDED_LINE_SPLITTER_H
+

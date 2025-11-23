@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -148,3 +148,4 @@ public:
 } // Namespace Assimp
 
 #endif // AI_PROGRESSHANDLER_H_INC
+

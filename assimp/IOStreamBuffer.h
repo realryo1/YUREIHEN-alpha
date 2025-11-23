@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -350,3 +350,4 @@ AI_FORCE_INLINE bool IOStreamBuffer<T>::getNextBlock(std::vector<T> &buffer) {
 } // namespace Assimp
 
 #endif // AI_IOSTREAMBUFFER_H_INC
+

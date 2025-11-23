@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -271,3 +271,4 @@ ASSIMP_API void aiReleaseExportBlob(const C_STRUCT aiExportDataBlob *pData);
 
 #endif // ASSIMP_BUILD_NO_EXPORT
 #endif // AI_EXPORT_H_INC
+

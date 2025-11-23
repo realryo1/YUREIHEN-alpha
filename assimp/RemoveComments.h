@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -91,3 +91,4 @@ public:
 } // ! Assimp
 
 #endif // !! AI_REMOVE_COMMENTS_H_INC
+

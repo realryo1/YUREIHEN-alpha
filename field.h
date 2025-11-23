@@ -1,4 +1,4 @@
-//field.h
+ï»¿//field.h
 #pragma once
 
 #include <d3d11.h>
@@ -9,7 +9,7 @@
 
 using namespace DirectX;
 
-//MAP\¬ƒuƒƒbƒN‚ÌŽí—Þ
+//MAPæ§‹æˆãƒ–ãƒ­ãƒƒã‚¯ã®ç¨®é¡ž
 enum FIELD
 {
 	FIELD_BOX = 0,
@@ -17,13 +17,13 @@ enum FIELD
 	FIELD_MAX
 };
 
-//MAPƒf[ƒ^\‘¢‘Ì
+//MAPãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“
 class MAPDATA
 {
 public:
-	XMFLOAT3 pos;    //ƒuƒƒbƒN‚ÌÀ•W
-	FIELD    no;     //ƒuƒƒbƒN‚ÌŽí—Þ
-	//‚»‚Ì‘¼•K—v‚È•¨‚Í’Ç‰Á‚·‚é
+	XMFLOAT3 pos;    //ãƒ–ãƒ­ãƒƒã‚¯ã®åº§æ¨™
+	FIELD    no;     //ãƒ–ãƒ­ãƒƒã‚¯ã®ç¨®é¡ž
+	//ãã®ä»–å¿…è¦ãªç‰©ã¯è¿½åŠ ã™ã‚‹
 };
 
 void Field_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

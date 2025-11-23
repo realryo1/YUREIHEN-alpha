@@ -1,4 +1,4 @@
-/*
+﻿/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -150,7 +150,7 @@ public:
      *  vector called "from" into another vector called "to".
      * Input : from[3], to[3] which both must be *normalized* non-zero vectors
      * Output: mtx[3][3] -- a 3x3 matrix in column-major form
-     * Authors: Tomas Möller, John Hughes
+     * Authors: Tomas Mﾃｶller, John Hughes
      *          "Efficiently Building a Matrix to Rotate One Vector to Another"
      *          Journal of Graphics Tools, 4(4):1-4, 1999
      */
@@ -176,3 +176,4 @@ struct aiMatrix3x3 {
 #endif // __cplusplus
 
 #endif // AI_MATRIX3X3_H_INC
+

@@ -1,4 +1,4 @@
-/** Helper class to construct a dummy mesh for file formats containing only motion data */
+﻿/** Helper class to construct a dummy mesh for file formats containing only motion data */
 
 /*
 Open Asset Import Library (assimp)
@@ -126,3 +126,4 @@ private:
 } // end of namespace Assimp
 
 #endif // AI_SKELETONMESHBUILDER_H_INC
+

@@ -1,11 +1,11 @@
-//==================================================
+﻿//==================================================
 //main.cpp
-//����ҁF�߉��ɑ�
-//������F2025/05/09
+//・ｽ・ｽ・ｽ・ｽﾒ：・ｽﾟ会ｿｽ・ｽﾉ托ｿｽ
+//・ｽ・ｽ・ｽ・ｽ・ｽ・ｽF2025/05/09
 //==================================================
 
-#include <SDKDDKVer.h> //���p�ł���ł���ʂ�Windows�v���b�g�t�H�[������`�����
-#define WIN32_LEAN_AND_MEAN	//32bit�A�v���ɂ͕s�v�ȏ��𖳎�
+#include <SDKDDKVer.h> //・ｽ・ｽ・ｽp・ｽﾅゑｿｽ・ｽ・ｽﾅゑｿｽ・ｽ・ｽﾊゑｿｽWindows・ｽv・ｽ・ｽ・ｽb・ｽg・ｽt・ｽH・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ`・ｽ・ｽ・ｽ・ｽ・ｽ
+#define WIN32_LEAN_AND_MEAN	//32bit・ｽA・ｽv・ｽ・ｽ・ｽﾉは不・ｽv・ｽﾈ擾ｿｽ・ｽｳ趣ｿｽ
 #include <windows.h>
 #include <algorithm>
 #include "scene.h"
@@ -18,7 +18,7 @@
 #include "mouse.h"
 
 //==================================
-//�O���[�o���ϐ�
+//・ｽO・ｽ・ｽ・ｽ[・ｽo・ｽ・ｽ・ｽﾏ撰ｿｽ
 //==================================
 
 //#ifndef _DEBUG
@@ -29,12 +29,12 @@ char g_DebugStr[2048];
 #pragma comment(lib, "winmm.lib")
 
 //==================================
-//���C���֐�
+//・ｽ・ｽ・ｽC・ｽ・ｽ・ｽﾖ撰ｿｽ
 //==================================
 //==================================  
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	//�t���[�����[�g�v���p�ϐ�
+	//・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽg・ｽv・ｽ・ｽ・ｽp・ｽﾏ撰ｿｽ
 	DWORD dwExecLastTime;
 	DWORD dwFPSLastTime;
 	DWORD dwCurrentTime;
@@ -42,45 +42,45 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	HRESULT dummy = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
 
-	//�E�B���h�E�N���X�̓o�^
-	WNDCLASS wc;//�\���̂��`
-	ZeroMemory(&wc, sizeof(WNDCLASS));//�\���̏�����
-	wc.lpfnWndProc = WndProc;//������
-	wc.lpszClassName = CLASS_NAME;//�d�l���̖��O
-	wc.hInstance = hInstance;//���̃A�v���̂���
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);//cursor�̎��
-	wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);//�w�i�F
-	RegisterClass(&wc);//�\���̂�windows�ɃZ�b�g
+	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽN・ｽ・ｽ・ｽX・ｽﾌ登・ｽ^
+	WNDCLASS wc;//・ｽ\・ｽ・ｽ・ｽﾌゑｿｽ・ｽ`
+	ZeroMemory(&wc, sizeof(WNDCLASS));//・ｽ\・ｽ・ｽ・ｽﾌ擾ｿｽ・ｽ・ｽ・ｽ・ｽ
+	wc.lpfnWndProc = WndProc;//・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+	wc.lpszClassName = CLASS_NAME;//・ｽd・ｽl・ｽ・ｽ・ｽﾌ厄ｿｽ・ｽO
+	wc.hInstance = hInstance;//・ｽ・ｽ・ｽﾌア・ｽv・ｽ・ｽ・ｽﾌゑｿｽ・ｽ・ｽ
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);//cursor・ｽﾌ趣ｿｽ・ｽ
+	wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);//・ｽw・ｽi・ｽF
+	RegisterClass(&wc);//・ｽ\・ｽ・ｽ・ｽﾌゑｿｽwindows・ｽﾉセ・ｽb・ｽg
 
-	//�E�B���h�E�T�C�Y�̒���
-	//�N���C�A���g�̈�i�`��̈�j�̃T�C�Y��\����`
+	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽT・ｽC・ｽY・ｽﾌ抵ｿｽ・ｽ・ｽ
+	//・ｽN・ｽ・ｽ・ｽC・ｽA・ｽ・ｽ・ｽg・ｽﾌ茨ｿｽi・ｽ`・ｽ・ｽﾌ茨ｿｽj・ｽﾌサ・ｽC・ｽY・ｽ・ｽ\・ｽ・ｽ・ｽ・ｽ`
 	RECT window_rect = { 0,0,(LONG)SCREEN_WIDTH,(LONG)SCREEN_HEIGHT };
-	//�E�B���h�E�X�^�C���̐ݒ�
+	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽX・ｽ^・ｽC・ｽ・ｽ・ｽﾌ設抵ｿｽ
 	DWORD window_style = WS_OVERLAPPEDWINDOW ^ (WS_THICKFRAME | WS_MAXIMIZEBOX);
-	//�w��̃N���C�A���g�̈�{�E�B���h�E�X�^�C���ł̑S�̂̃T�C�Y���v�Z
+	//・ｽw・ｽ・ｽﾌク・ｽ・ｽ・ｽC・ｽA・ｽ・ｽ・ｽg・ｽﾌ茨ｿｽ{・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽX・ｽ^・ｽC・ｽ・ｽ・ｽﾅの全・ｽﾌのサ・ｽC・ｽY・ｽ・ｽ・ｽv・ｽZ
 	AdjustWindowRect(&window_rect, window_style, FALSE);
-	//��`�̉��Əc�̃T�C�Y���v�Z
+	//・ｽ・ｽ`・ｽﾌ会ｿｽ・ｽﾆ縦・ｽﾌサ・ｽC・ｽY・ｽ・ｽ・ｽv・ｽZ
 	int window_width = window_rect.right - window_rect.left;
 	int window_height = window_rect.bottom - window_rect.top;
 
-	//�E�B���h�E�̍쐬
+	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽﾌ作成
 	HWND hWnd = CreateWindow(
-		CLASS_NAME,		//��肽���E�B���h�E
-		WINDOW_CAPTION,	//�E�B���h�E�ɕ\������^�C�g��
-		window_style,//�W���I�ȃT�C�Y�̃E�B���h�E�@�T�C�Y�ύX�֎~
-		CW_USEDEFAULT,	//�ȉ�default
+		CLASS_NAME,		//・ｽ・ｽ閧ｽ・ｽ・ｽ・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE
+		WINDOW_CAPTION,	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽﾉ表・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ^・ｽC・ｽg・ｽ・ｽ
+		window_style,//・ｽW・ｽ・ｽ・ｽI・ｽﾈサ・ｽC・ｽY・ｽﾌウ・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ@・ｽT・ｽC・ｽY・ｽﾏ更・ｽﾖ止
+		CW_USEDEFAULT,	//・ｽﾈ会ｿｽdefault
 		CW_USEDEFAULT,
-		window_width,//�E�B���h�E�̕�
-		window_height,//�E�B���h�E�̍���
+		window_width,//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽﾌ包ｿｽ
+		window_height,//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽﾌ搾ｿｽ・ｽ・ｽ
 		NULL,
 		NULL,
-		hInstance,	//�A�v���̃n���h��
+		hInstance,	//・ｽA・ｽv・ｽ・ｽ・ｽﾌハ・ｽ・ｽ・ｽh・ｽ・ｽ
 		NULL
 	);
 
-	ShowWindow(hWnd, nCmdShow);//�����ɏ]���ĕ\����\��
+	ShowWindow(hWnd, nCmdShow);//・ｽ・ｽ・ｽ・ｽ・ｽﾉ従・ｽ・ｽ・ｽﾄ表・ｽ・ｽ・ｽ・ｽ\・ｽ・ｽ
 
-	//�E�B���h�E�����̍X�V�v��
+	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ・ｽ・ｽ・ｽ・ｽﾌ更・ｽV・ｽv・ｽ・ｽ
 	UpdateWindow(hWnd);
 	Direct3D_Initialize(hWnd);
 	Keyboard_Initialize();
@@ -88,25 +88,25 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Shader_Initialize(Direct3D_GetDevice(), Direct3D_GetDeviceContext());
 	Init();
 
-	//���b�Z�[�W���[�v
+	//・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽ・ｽ・ｽ[・ｽv
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
 
-	//�t���[�����[�g�v��������
-	timeBeginPeriod(1);	//�^�C�}�[�̐��x��ݒ�@
+	//・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽg・ｽv・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+	timeBeginPeriod(1);	//・ｽ^・ｽC・ｽ}・ｽ[・ｽﾌ撰ｿｽ・ｽx・ｽ・ｽﾝ抵ｿｽ@
 	dwExecLastTime = dwFPSLastTime = timeGetTime();
 	dwCurrentTime = dwFrameCount = 0;
 
 	do
 	{
-		//�I�����b�Z�[�W������܂Ń��[�v �iWindows����̃��b�Z�[�W�͂��̂܂܎g���Ȃ��j
-		//while (GetMessage(&msg, NULL, 0, 0)) �Q�[�������ł͂Ȃ��炵��
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))	//�]�v�Ȃ��Ƃ����Ȃ��̂ő���
+		//・ｽI・ｽ・ｽ・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾜで・ｿｽ・ｽ[・ｽv ・ｽiWindows・ｽ・ｽ・ｽ・ｽﾌ・ｿｽ・ｽb・ｽZ・ｽ[・ｽW・ｽﾍゑｿｽ・ｽﾌまま使・ｽ・ｽ・ｽﾈゑｿｽ・ｽj
+		//while (GetMessage(&msg, NULL, 0, 0)) ・ｽQ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾅはなゑｿｽ・ｽ轤ｵ・ｽ・ｽ
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))	//・ｽ]・ｽv・ｽﾈゑｿｽ・ｽﾆゑｿｽ・ｽ・ｽ・ｽﾈゑｿｽ・ｽﾌで托ｿｽ・ｽ・ｽ
 		{
 			TranslateMessage(&msg);
-			DispatchMessage(&msg); //WndProc���Ăяo�����
+			DispatchMessage(&msg); //WndProc・ｽ・ｽ・ｽﾄび出・ｽ・ｽ・ｽ・ｽ・ｽ
 		}
-		//�Q�[���̏���
+		//・ｽQ・ｽ[・ｽ・ｽ・ｽﾌ擾ｿｽ・ｽ・ｽ
 		else
 		{
 			dwCurrentTime = timeGetTime();
@@ -125,20 +125,19 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 				dwExecLastTime = dwCurrentTime;
 
 				//#ifndef _DEBUG
-								//�E�B���h�E�L���v�V�����֌��݂�FPS��\��
 				wsprintf(g_DebugStr, "DX21");
-				wsprintf(&g_DebugStr[strlen(g_DebugStr)], "FPS�F%d", g_CountFPS);
+				wsprintf(&g_DebugStr[strlen(g_DebugStr)], "FPS: %d", g_CountFPS);
 				SetWindowText(hWnd, g_DebugStr);
 				//#endif
-				//�X�V
+				//・ｽX・ｽV
 				Update();
 
-				//�`��
-				Direct3D_Clear();//�o�b�t�@�̃N���A
+				//・ｽ`・ｽ・ｽ
+				Direct3D_Clear();//・ｽo・ｽb・ｽt・ｽ@・ｽﾌク・ｽ・ｽ・ｽA
 
 				Draw();
 
-				Direct3D_Present();//�o�b�t�@�̕\��
+				Direct3D_Present();//・ｽo・ｽb・ｽt・ｽ@・ｽﾌ表・ｽ・ｽ
 
 				keycopy();
 
@@ -146,27 +145,27 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 			}
 		}
 
-	} while (msg.message != WM_QUIT);//windows����I�����b�Z�[�W�������烋�[�v�I��
+	} while (msg.message != WM_QUIT);//windows・ｽ・ｽ・ｽ・ｽI・ｽ・ｽ・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ辜具ｿｽ[・ｽv・ｽI・ｽ・ｽ
 
 	Finalize();
 	Shader_Finalize();
 	Direct3D_Finalize();
 
 
-	//�I��
+	//・ｽI・ｽ・ｽ
 	return (int)msg.wParam;
 }
 
 //==================================
-//�E�B���h�E�v���V�[�W��
-//���b�Z�[�W���[�v���ŌĂяo��
+//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽv・ｽ・ｽ・ｽV・ｽ[・ｽW・ｽ・ｽ
+//・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽ・ｽ・ｽ[・ｽv・ｽ・ｽ・ｽﾅ呼び出・ｽ・ｽ
 //==================================
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//HGDIOBJ hbrWhite, hbrGray;
 
-	//HDC hdc;			//�f�o�C�X�R���e�L�X�g
-	//PAINTSTRUCT ps;		//�E�B���h�E��ʂ̑傫���ȂǕ`��֘A�̏��
+	//HDC hdc;			//・ｽf・ｽo・ｽC・ｽX・ｽR・ｽ・ｽ・ｽe・ｽL・ｽX・ｽg
+	//PAINTSTRUCT ps;		//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ・ｽﾊの大き・ｽ・ｽ・ｽﾈど描・ｽ・ｽﾖ連・ｽﾌ擾ｿｽ・ｽ
 
 	Mouse_ProcessMessage(uMsg, wParam, lParam);
 
@@ -184,31 +183,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSKEYUP:
 		Keyboard_ProcessMessage(uMsg, wParam, lParam);
 		break;
-		//case WM_PAINT:	//�E�B���h�E�\���̖���
-		//	hdc = BeginPaint(hWnd, &ps);//�`��Ɋւ�������󂯎��
-		//	EndPaint(hWnd, &ps);	//�\�������@hdc���J������
+		//case WM_PAINT:	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ\・ｽ・ｽ・ｽﾌ厄ｿｽ・ｽ・ｽ
+		//	hdc = BeginPaint(hWnd, &ps);//・ｽ`・ｽ・ｽﾉ関ゑｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽｯ趣ｿｽ・ｽ
+		//	EndPaint(hWnd, &ps);	//・ｽ\・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ@hdc・ｽ・ｽ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
 		//	return 0;
 		//	break;
-	case WM_KEYDOWN:	//�L�[�������ꂽ
+	case WM_KEYDOWN:	//・ｽL・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ黷ｽ
 		//if (wParam == VK_ESCAPE)
 		//{
-		//	//�E�B���h�E����������N�G�X�g��Windows�ɑ���
+		//	//・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ・ｽﾂゑｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽN・ｽG・ｽX・ｽg・ｽ・ｽWindows・ｽﾉ托ｿｽ・ｽ・ｽ
 		//	SendMessage(hWnd, WM_CLOSE, 0, 0);
 		//}
 		Keyboard_ProcessMessage(uMsg, wParam, lParam);
 
 		break;
 	case WM_CLOSE:
-		hal::dout << "�I���m�F\n" << std::endl;
+		hal::dout << "・ｽI・ｽ・ｽ・ｽm・ｽF\n" << std::endl;
 
-		if (MessageBox(hWnd, "�{���ɏI�����Ă�낵���ł���", "�m�F", MB_OKCANCEL | MB_DEFBUTTON2) == IDOK)
+		if (MessageBox(hWnd, "・ｽ{・ｽ・ｽ・ｽﾉ終・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｵ・ｽ・ｽ・ｽﾅゑｿｽ・ｽ・ｽ", "・ｽm・ｽF", MB_OKCANCEL | MB_DEFBUTTON2) == IDOK)
 		{
-			//OK�������ꂽ
+			//OK・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ黷ｽ
 			DestroyWindow(hWnd);
 		}
 		else
 		{
-			//�I���Ȃ�
+			//・ｽI・ｽ・ｽ・ｽﾈゑｿｽ
 			return 0;
 		}
 		break;
@@ -217,6 +216,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	//�K�v�̂Ȃ����b�Z�[�W�͓K���ɏ�������炵��
+	//・ｽK・ｽv・ｽﾌなゑｿｽ・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽﾍ適・ｽ・ｽ・ｽﾉ擾ｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ轤ｵ・ｽ・ｽ
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

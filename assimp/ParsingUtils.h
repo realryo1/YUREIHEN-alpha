@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -270,3 +270,4 @@ inline std::string ai_stdStrToLower(const std::string &str) {
 } // namespace Assimp
 
 #endif // ! AI_PARSING_UTILS_H_INC
+

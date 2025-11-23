@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -100,4 +100,5 @@ private:
 }
 
 #endif // AI_INCLUDED_PROFILER_H
+
 

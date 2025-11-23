@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -106,3 +106,4 @@ inline LogStream::~LogStream() = default;
 } // Namespace Assimp
 
 #endif // INCLUDED_AI_LOGSTREAM_H
+

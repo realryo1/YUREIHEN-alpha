@@ -1,4 +1,4 @@
-/*
+﻿/*
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
@@ -137,3 +137,4 @@ AI_FORCE_INLINE DefaultIOStream::DefaultIOStream (FILE* pFile, const std::string
 } // ns assimp
 
 #endif //!!AI_DEFAULTIOSTREAM_H_INC
+
