@@ -14,7 +14,7 @@ void ModelDraw_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	g_pDevice = pDevice;
 	g_pContext = pContext;
 
-	g_testModel = ModelLoad("asset\\model\\test.fbx");
+	g_testModel = ModelLoad("asset\\model\\ball.fbx");
 }
 
 void ModelDraw_Update(void)
