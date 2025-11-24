@@ -18,15 +18,15 @@ XMFLOAT3 move;
 float rotate_x_ruiseki = 0.0f;
 float cameraDistance = 5.0f;
 
-static CameraControlMode currentMode;
+static CameraControlMode currentMode = CAMERA_MODE_KEYBOARD;
 static Mouse_State previousMouseState = {};
 
-// カーソルを確実に表示/非表示にする関数
+// カーソルを確実に表示/非表示にする関数[web:54][web:55]
 static void EnsureCursorVisible(bool visible)
 {
     if (visible)
     {
-        // カーソルが表示されるまでShowCursor(TRUE)を呼ぶ
+        // カーソルが表示されるまでShowCursor(TRUE)を呼ぶ[web:52][web:53]
         int count = ShowCursor(TRUE);
         while (count < 0)
         {
@@ -35,7 +35,7 @@ static void EnsureCursorVisible(bool visible)
     }
     else
     {
-        // カーソルが非表示になるまでShowCursor(FALSE)を呼ぶ
+        // カーソルが非表示になるまでShowCursor(FALSE)を呼ぶ[web:52][web:53]
         int count = ShowCursor(FALSE);
         while (count >= 0)
         {
@@ -47,10 +47,10 @@ static void EnsureCursorVisible(bool visible)
 void Camera_Initialize(void)
 {
     CameraObject = new Camera();
-    currentMode = CAMERA_MODE_MOUSE_FPS;
+    currentMode = CAMERA_MODE_KEYBOARD;
     Mouse_GetState(&previousMouseState);
 
-    // 初期状態ではカーソルを表示
+    // 初期状態ではカーソルを表示[web:54]
     EnsureCursorVisible(true);
 }
 
@@ -282,15 +282,15 @@ static void ApplyCameraTransform(void)
 
 void Camera_Update(void)
 {
-    // escキーでモード切り替え
-    if (Keyboard_IsKeyDownTrigger(KK_ESCAPE))
+    // Tabキーでモード切り替え[web:55]
+    if (Keyboard_IsKeyDownTrigger(KK_TAB))
     {
         if (currentMode == CAMERA_MODE_KEYBOARD)
         {
             currentMode = CAMERA_MODE_MOUSE_FPS;
             Mouse_SetMode(MOUSE_POSITION_MODE_RELATIVE);
 
-            // カーソルを確実に非表示
+            // カーソルを確実に非表示[web:54][web:55]
             EnsureCursorVisible(false);
 
             rotate.x = 0.0f;
@@ -302,7 +302,7 @@ void Camera_Update(void)
             currentMode = CAMERA_MODE_KEYBOARD;
             Mouse_SetMode(MOUSE_POSITION_MODE_ABSOLUTE);
 
-            // カーソルを確実に表示
+            // カーソルを確実に表示[web:54][web:55]
             EnsureCursorVisible(true);
 
             rotate.x = 0.0f;
@@ -359,3 +359,4 @@ void Camera_SetMode(CameraControlMode mode)
     rotate.x = 0.0f;
     rotate.y = 0.0f;
 }
+
