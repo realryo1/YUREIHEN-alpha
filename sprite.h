@@ -1,25 +1,9 @@
-
-//sprite.h
-
 #pragma once
 
 #include <d3d11.h>
 #include "direct3d.h"
 #include <DirectXMath.h>
 using namespace DirectX;
-
-//プロトタイプ宣言
-void		DrawSprite(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col);
-void		DrawSpriteEx(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc);
-void		InitializeSprite();	//スプライト初期化
-void		FinalizeSprite();	//スプライト終了
-void		DrawSpriteScroll(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col,
-										XMFLOAT2 texcoord);
-
-void		DrawSpriteExRotation(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc, float radian);
-
-void	DrawSprite(XMFLOAT2 size, XMFLOAT4 col, int bno, int wc, int hc);//行列使用版
-
 
 // 頂点構造体
 struct Vertex
@@ -29,3 +13,7 @@ struct Vertex
 	XMFLOAT2 texCoord;	//テクスチャ座標
 };
 
+//プロトタイプ宣言
+void InitializeSprite(void);	//スプライト初期化
+void FinalizeSprite(void);	//スプライト終了
+void Sprite_Draw(XMFLOAT2 pos, XMFLOAT2 size, XMFLOAT4 color, BLENDSTATE bstate, ID3D11ShaderResourceView* g_Texture);
