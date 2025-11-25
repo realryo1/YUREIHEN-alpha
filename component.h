@@ -53,6 +53,35 @@ public:
 	}
 };
 
+// 2D —p‚Ì Transform ƒNƒ‰ƒX
+class Transform2D
+{
+protected:
+	XMFLOAT2 m_Position;
+	float    m_Rotation; // degrees
+	XMFLOAT2 m_Scale;
+public:
+	Transform2D(XMFLOAT2 p = XMFLOAT2(0.0f, 0.0f), float r = 0.0f, XMFLOAT2 s = XMFLOAT2(1.0f, 1.0f)) :
+		m_Position(p), m_Rotation(r), m_Scale(s)
+	{
+	}
+
+	// getters
+	XMFLOAT2 GetPos() const { return m_Position; }
+	float GetRot() const { return m_Rotation; }
+	XMFLOAT2 GetScale() const { return m_Scale; }
+
+	// setters
+	void SetPos(const XMFLOAT2& p) { m_Position = p; }
+	void SetRot(float r) { m_Rotation = r; }
+	void SetScale(const XMFLOAT2& s) { m_Scale = s; }
+
+	// adders
+	XMFLOAT2 AddPos(const XMFLOAT2& p) { m_Position.x += p.x; m_Position.y += p.y; return m_Position; }
+	float AddRot(float r) { m_Rotation += r; return m_Rotation; }
+	XMFLOAT2 AddScale(const XMFLOAT2& s) { m_Scale.x += s.x; m_Scale.y += s.y; return m_Scale; }
+};
+
 // component.h ‚É’Ç‰Á
 enum class CollisionFace
 {
