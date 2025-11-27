@@ -140,6 +140,7 @@
     <ClCompile Include="component.h" />
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="direct3d.cpp" />
+    <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="field.h" />
     <ClCompile Include="keyboard.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="direct3d.h" />
     <ClInclude Include="DirectXTex.h" />
     <ClInclude Include="box.h" />
+    <ClInclude Include="fade.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="model.h" />

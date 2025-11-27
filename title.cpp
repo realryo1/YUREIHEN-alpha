@@ -3,6 +3,7 @@
 #include "sprite.h"
 #include "texture.h"
 #include "keyboard.h"
+#include "fade.h"
 #include "debug_ostream.h"
 
 // ①Spriteのインスタンス、ポインタ用意
@@ -27,6 +28,11 @@ void Title_Update(void)
 	if (Keyboard_IsKeyDown(KK_SPACE))
 	{
 		g_pTitleSprite->AddRot(1.0f);
+	}
+	// ③適当な処理　アニメーションなどもここで
+	if (Keyboard_IsKeyDown(KK_ENTER))
+	{
+		StartFade(SCENE_GAME);
 	}
 }
 

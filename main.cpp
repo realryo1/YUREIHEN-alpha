@@ -16,6 +16,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "sprite.h"
+#include "fade.h"
 
 //==================================
 //グローバル変数
@@ -87,6 +88,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Mouse_Initialize(hWnd);
 	Shader_Initialize(Direct3D_GetDevice(), Direct3D_GetDeviceContext());
 	Sprite_Initialize();
+	Fade_Initialize();
 	Init();
 
 	//メッセージループ
@@ -132,12 +134,14 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 				SetWindowText(hWnd, g_DebugStr);
 				//#endif
 				//更新
+				Fade_Update();
 				Update();
 
 				//描画
 				Direct3D_Clear();//バッファのクリア
 
 				Draw();
+				Fade_Draw();
 
 				Direct3D_Present();//バッファの表示
 
@@ -150,6 +154,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	} while (msg.message != WM_QUIT);//windowsから終了メッセージが来たらループ終了
 
 	Finalize();
+	Fade_Finalize();
 	Sprite_Finalize();
 	Shader_Finalize();
 	Direct3D_Finalize();
