@@ -4,14 +4,14 @@
 using namespace DirectX;
 
 
-class Transform
+class Transform3D
 {
 protected:
 	XMFLOAT3 m_Position;
 	XMFLOAT3 m_Rotation;
 	XMFLOAT3 m_Scale;
 public:
-	Transform(XMFLOAT3 p = XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3 r = XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3 s = XMFLOAT3(0.0f, 0.0f, 0.0f)) :
+	Transform3D(XMFLOAT3 p = XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3 r = XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3 s = XMFLOAT3(0.0f, 0.0f, 0.0f)) :
 		m_Position(p), m_Rotation(r), m_Scale(s)
 	{
 	}
@@ -122,9 +122,9 @@ public:
     }
 
     // 衝突判定と位置補正
-    CollisionResult CheckCollisionAndResolve(Transform& myTransform,
+    CollisionResult CheckCollisionAndResolve(Transform3D& myTransform,
         const BoxCollider& other,
-        const Transform& otherTransform)
+        const Transform3D& otherTransform)
     {
         CollisionResult result;
 
@@ -236,9 +236,9 @@ public:
     }
 
     // 読み取り専用版（constバージョン）
-    CollisionResult CheckCollisionDetailed(const Transform& myTransform,
+    CollisionResult CheckCollisionDetailed(const Transform3D& myTransform,
         const BoxCollider& other,
-        const Transform& otherTransform) const
+        const Transform3D& otherTransform) const
     {
         // 位置補正なしの判定のみ（既存のコード）
         CollisionResult result;

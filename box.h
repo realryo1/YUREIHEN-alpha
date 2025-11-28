@@ -6,12 +6,12 @@
 void CreateBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 	ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer);
 
-class Box : public Transform, public BoxCollider
+class Box : public Transform3D, public BoxCollider
 {
 
 public:
 	Box(XMFLOAT3 pos, XMFLOAT3 size, bool isTrigger) :
-		Transform(pos), BoxCollider(size, isTrigger)
+		Transform3D(pos), BoxCollider(size, isTrigger)
 	{
 	}
 };
