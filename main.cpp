@@ -208,7 +208,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		hal::dout << "終了確認\n" << std::endl;
 
-		if (MessageBox(hWnd, "本当に終了してよろしいですか", "確認", MB_OKCANCEL | MB_DEFBUTTON2) == IDOK)
+		//if (MessageBox(hWnd, "本当に終了してよろしいですか", "確認", MB_OKCANCEL | MB_DEFBUTTON2) == IDOK)
+		if(true)
 		{
 			//OKが押された
 			DestroyWindow(hWnd);
