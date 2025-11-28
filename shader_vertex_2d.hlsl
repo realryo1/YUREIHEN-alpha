@@ -46,6 +46,8 @@ struct VS_OUTPUT
     float4 posH : SV_POSITION;
     float4 color : COLOR0;
     float2 texcoord : TEXCOORD0;
+    float4 normal : NORMAL0;        // 法線をピクセルシェーダーに渡す
+    float4 worldPos : TEXCOORD1;    // ワールド座標
 };
 
 VS_OUTPUT main(VS_INPUT vs_in)
@@ -54,40 +56,24 @@ VS_OUTPUT main(VS_INPUT vs_in)
     
     //頂点を行列で変換
     vs_out.posH = mul(vs_in.posL, mtx);
-    //t頂点Colorはそのまま出力
-    vs_out.color = vs_in.color;
     
+    //テクスチャ座標
     vs_out.texcoord = vs_in.texcoord;
-   
-    if (Light.enable == true)
-    {
-        //法線をワールド変換
-        float4 normal = float4(vs_in.normal.xyz, 0.0f);//法線をコピー
-        normal = mul(normal, worldMtx); //ワールド変換
-        normal = normalize(normal); //正規化
-        
-        //ライティング
-        float light = -dot(normal.xyz, -Light.Direction.xyz);
-        light = saturate(light); //0～1にクランプ 飽和演算
-        vs_out.color.rgb *= light;
-        vs_out.color.rgb += Light.Ambient.rgb; //環境光を加算
-    }
     
+    // ワールド座標を計算（ライティング計算用）
+    vs_out.worldPos = mul(vs_in.posL, worldMtx);
+    
+    // 法線をワールド座標系に変換
+    vs_out.normal = float4(vs_in.normal.xyz, 0.0f);
+    vs_out.normal = mul(vs_out.normal, worldMtx);
+    vs_out.normal = normalize(vs_out.normal);
+    
+    // 頂点カラーは そのまま出力
+    vs_out.color = vs_in.color;
     
     return vs_out;
 }
 
 //=============================================================================
-// 頂点シェーダ
+// 頂点シェーダー
 //=============================================================================
-
-
-
-
-
-
-
-//float4 main(in float4 posL : POSITION0 ) : SV_POSITION
-//{
-//	return mul(posL, mtx);
-//}

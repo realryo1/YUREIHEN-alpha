@@ -21,6 +21,7 @@ void Shader_SetMatrix(const DirectX::XMMATRIX& matrix);
 
 void Shader_SetWorldMatrix(const DirectX::XMMATRIX& matrix);
 void Shader_SetLight(Light* light);
+void Shader_SetMaterialColor(const DirectX::XMFLOAT4& color);
 
 void Shader_Begin();
 

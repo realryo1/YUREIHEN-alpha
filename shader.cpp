@@ -22,6 +22,7 @@ static ID3D11PixelShader* g_pPixelShader = nullptr;//ピクセルシェーダー
 
 static ID3D11Buffer* g_pLightConstantBuffer = nullptr;//定数バッファ1個
 static ID3D11Buffer* g_pWorldConstantBuffer = nullptr;//定数バッファ1個
+static ID3D11Buffer* g_pMaterialColorBuffer = nullptr;//マテリアル色バッファ
 
 // 注意！初期化で外部から設定されるもの。Release不要。
 static ID3D11Device* g_pDevice = nullptr;
@@ -104,11 +105,14 @@ bool Shader_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	g_pContext->VSSetConstantBuffers(0, 1, &g_pVSConstantBuffer); // 定数バッファを頂点シェーダーにセット
 
 	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pWorldConstantBuffer);
-	g_pContext->VSSetConstantBuffers(1, 1, &g_pWorldConstantBuffer); // 定数バッファを頂点シェーダーにセット
+	g_pContext->VSSetConstantBuffers(1, 1, &g_pWorldConstantBuffer);  // ワールド行列
 
-	buffer_desc.ByteWidth = sizeof(Light); // バッファのサイズ //<<<<<<<<<<XMFLOAT4X4に変更
 	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pLightConstantBuffer);
-	g_pContext->VSSetConstantBuffers(2, 1, &g_pLightConstantBuffer); // 定数バッファを頂点シェーダーにセット
+	g_pContext->VSSetConstantBuffers(2, 1, &g_pLightConstantBuffer);  // ライト情報
+
+	// マテリアル色バッファの作成
+	buffer_desc.ByteWidth = sizeof(XMFLOAT4);
+	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pMaterialColorBuffer);
 
 	// 事前コンパイル済みピクセルシェーダーの読み込み
 	std::ifstream ifs_ps("shader_pixel_2d.cso", std::ios::binary);
@@ -147,6 +151,7 @@ void Shader_Finalize()
 
 	SAFE_RELEASE(g_pWorldConstantBuffer);
 	SAFE_RELEASE(g_pLightConstantBuffer);
+	SAFE_RELEASE(g_pMaterialColorBuffer);
 }
 
 void Shader_SetMatrix(const DirectX::XMMATRIX& matrix)
@@ -179,6 +184,12 @@ void Shader_SetLight(Light* light)
 	g_pContext->UpdateSubresource(g_pLightConstantBuffer, 0, nullptr, light, 0, 0);
 }
 
+void Shader_SetMaterialColor(const DirectX::XMFLOAT4& color)
+{
+	// 定数バッファにマテリアル色をセット
+	g_pContext->UpdateSubresource(g_pMaterialColorBuffer, 0, nullptr, &color, 0, 0);
+}
+
 void Shader_Begin()
 {
 	// 頂点シェーダーとピクセルシェーダーを描画パイプラインに設定
@@ -190,4 +201,10 @@ void Shader_Begin()
 
 	// 定数バッファを描画パイプラインに設定
 	g_pContext->VSSetConstantBuffers(0, 1, &g_pVSConstantBuffer);
+	g_pContext->VSSetConstantBuffers(1, 1, &g_pWorldConstantBuffer);  // ワールド行列をセット
+	g_pContext->VSSetConstantBuffers(2, 1, &g_pLightConstantBuffer);  // ライト情報を頂点シェーダーに設定
+	
+	// ピクセルシェーダーにもライト定数バッファとマテリアル色バッファを設定
+	g_pContext->PSSetConstantBuffers(2, 1, &g_pLightConstantBuffer);
+	g_pContext->PSSetConstantBuffers(3, 1, &g_pMaterialColorBuffer);
 }
