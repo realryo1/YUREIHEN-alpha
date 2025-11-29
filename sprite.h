@@ -49,6 +49,7 @@ public:
 	}
 
 	XMFLOAT4 GetColor(void) const { return m_Color; }
+	void SetColor(const XMFLOAT4& color) { m_Color = color; }
 	BLENDSTATE GetBlendState(void) const { return m_BlendState; }
 	ID3D11ShaderResourceView* GetTexture(void) const { return m_Texture; }
 
@@ -94,6 +95,7 @@ public:
 	int GetDivideY(void) const { return m_DivideY; }
 
 	void SetTextureNumber(int textureNumber) { m_TextureNumber = textureNumber; }
+	int GetTextureNumber(void) const { return m_TextureNumber; }
 
 	// インスタンスごとに描画する
 	//　描画するテクスチャ番号を引数で指定（デフォルト0）

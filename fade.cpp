@@ -56,3 +56,12 @@ void StartFade(SCENE ns)
 		g_pFade->StartFade(ns);
 	}
 }
+
+// 外部ラッパー：GetState 呼び出し
+FADESTAT GetFadeState(void)
+{
+	if (g_pFade) {
+		return g_pFade->GetState();
+	}
+	return FADE_NONE;
+}

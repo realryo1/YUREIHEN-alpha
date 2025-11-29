@@ -6,7 +6,7 @@
 #include "texture.h"
 #include "title.h"
 
-SCENE scene = SCENE_GAME;
+SCENE scene = SCENE_ANM_LOGO;
 
 void Init(void)
 {

@@ -105,6 +105,7 @@ void Fade_Initialize(void);
 void Fade_Update(void);
 void Fade_Draw(void);
 void Fade_Finalize(void);
-void StartFade(SCENE ns);
+void StartFade(SCENE ns = SCENE_NONE);
+FADESTAT GetFadeState(void);
 
 #endif
