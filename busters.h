@@ -40,12 +40,6 @@ public:
 	// 更新メソッド（パトロールとジャンプ処理を含む）
 	void Update(void)
 	{
-		//ジャンプ中なら色を変える
-		if (m_IsJumping)
-		{
-			this->SetColor(0.0f, 0.0f, 1.0f, 1.0f);//青
-		}
-
 		// ジャンプ状態の更新（まず最初に実行してY座標を計算）
 		JumpUpdate(*(Transform3D*)this);
 
@@ -92,8 +86,8 @@ public:
 		{
 			this->SetColor(0.0f, 0.0f, 1.0f, 1.0f); // 青色
 		}
-		//ghostが恐怖可能範囲にいる
-		else if (m_IsGhostDiscover)
+		//ghostが恐怖可能範囲にいてかつ変身中なら
+		else if (m_IsGhostDiscover && GetGhost()->GetIsTransformed())
 		{
 			this->SetColor(0.0f, 1.0f, 0.0f, 1.0f); // 緑色
 		}
