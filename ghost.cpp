@@ -156,7 +156,7 @@ void Ghost::UpdateInput(void)
 				//‹°•|ƒRƒ“ƒ{‚ğã‚°‚é
 				ScareComboUP();
 				// ‹°•|ƒQ[ƒW‰ÁZ
-				AddScareGauge();
+				AddScareGauge(1.0f * UI_ScareCombo_GetNumber());
 			}
 		}
 		else

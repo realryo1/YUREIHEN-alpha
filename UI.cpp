@@ -105,6 +105,6 @@ void AddScareGauge(float value)
 {
 	if (g_ScareGauge)
 	{
-		g_ScareGauge->AddValue(value * UI_ScareCombo_GetNumber());
+		g_ScareGauge->AddValue(value);
 	}
 }
