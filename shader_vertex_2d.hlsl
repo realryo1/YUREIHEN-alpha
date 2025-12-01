@@ -64,11 +64,13 @@ VS_OUTPUT main(VS_INPUT vs_in)
     vs_out.worldPos = mul(vs_in.posL, worldMtx);
     
     // 法線をワールド座標系に変換
-    vs_out.normal = float4(vs_in.normal.xyz, 0.0f);
-    vs_out.normal = mul(vs_out.normal, worldMtx);
-    vs_out.normal = normalize(vs_out.normal);
+    // 法線は方向ベクトルなので、逆転置行列で変換する必要がある
+    // worldMtxが正規直交行列の場合は転置と逆転置が同じ
+    float4 normalWorld = float4(vs_in.normal.xyz, 0.0f);
+    normalWorld = mul(normalWorld, worldMtx);
+    vs_out.normal = normalize(normalWorld);
     
-    // 頂点カラーは そのまま出力
+    // 頂点カラーはそのまま出力
     vs_out.color = vs_in.color;
     
     return vs_out;

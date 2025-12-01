@@ -37,11 +37,21 @@ struct PS_INPUT
 
 float4 main(PS_INPUT ps_in) : SV_TARGET
 {
-    // テクスチャサンプル
+    // テクスチャをサンプル
     float4 texColor = g_Texture.Sample(g_SamplerState, ps_in.texcoord);
     
-    // ベースカラー決定：テクスチャカラー × マテリアル色 × 頂点カラー
-    float4 baseColor = texColor * MaterialColor * ps_in.color;
+    // マテリアルカラーが無効な場合（全て0の場合）は白にリセット
+    float4 materialColorSafe = MaterialColor;
+    if (MaterialColor.r == 0.0f && MaterialColor.g == 0.0f && MaterialColor.b == 0.0f)
+    {
+        materialColorSafe = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    
+    // ベースカラー = テクスチャカラー × マテリアルカラー × 頂点カラー
+    float4 baseColor = texColor * materialColorSafe * ps_in.color;
+    
+    // デフォルトのアンビエント光（最低限の明るさ）
+    float3 ambientColor = float3(0.3f, 0.3f, 0.3f);
     
     // ライティング計算（Lambert）
     if (Light.enable)
@@ -52,17 +62,22 @@ float4 main(PS_INPUT ps_in) : SV_TARGET
         // ライト方向を正規化
         float3 lightDir = normalize(-Light.Direction.xyz);
         
-        // Lambert項の計算
+        // Lambert値の計算
         float lambert = max(dot(normal, lightDir), 0.0f);
         
         // ディフューズライティング
         float3 diffuse = lambert * Light.Diffuse.rgb;
         
-        // アンビエント（環境光）の追加
+        // アンビエント（環境光）
         float3 ambient = Light.Ambient.rgb;
         
-        // 最終的なライティングカラーの合成
+        // 最終的なライティングカラーの算出
         baseColor.rgb *= (diffuse + ambient);
+    }
+    else
+    {
+        // ライトが無効な場合でも最低限のアンビエント光を適用
+        baseColor.rgb *= ambientColor;
     }
     
     return baseColor;

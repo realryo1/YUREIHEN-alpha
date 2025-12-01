@@ -66,9 +66,16 @@ void RenderNode(MODEL* model, aiNode* node, XMMATRIX parentTransform, const XMFL
 		else
 		{
 			// 色を乗算（元の動作）
-			if (meshIndex < model->AiScene->mNumMeshes)
+			if (meshIndex < model->AiScene->mNumMeshes && model->MeshMaterials)
 			{
 				XMFLOAT4 meshColor = model->MeshMaterials[meshIndex].diffuseColor;
+				
+				// メッシュの色が黒い場合は白にリセット（暗くならないようにするため）
+				if (meshColor.x == 0.0f && meshColor.y == 0.0f && meshColor.z == 0.0f)
+				{
+					meshColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+				
 				finalColor = XMFLOAT4(
 					meshColor.x * color.x,
 					meshColor.y * color.y,
@@ -133,20 +140,25 @@ MODEL* ModelLoad(const char* FileName)
 	{
 		aiMesh* mesh = model->AiScene->mMeshes[m];
 
-		// マテリアル情報取得
+		// マテリアル情報の取得
 		{
 			aiMaterial* material = model->AiScene->mMaterials[mesh->mMaterialIndex];
 
 			// ディフューズ色（基本色）を取得
 			aiColor4D diffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-			if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor))
+			aiReturn colorResult = material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+			
+			// マテリアル色が取得できなかった場合、または全て0の場合は白をデフォルトに設定
+			if (colorResult != AI_SUCCESS || 
+				(diffuseColor.r == 0.0f && diffuseColor.g == 0.0f && diffuseColor.b == 0.0f))
 			{
 				diffuseColor = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);  // デフォルトは白
+				std::cout << "Mesh " << m << ": Material color not found or black, using white as default" << std::endl;
 			}
 
 			model->MeshMaterials[m].diffuseColor = XMFLOAT4(diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a);
 
-			// テクスチャ情報を取得
+			// テクスチャ情報の取得
 			aiString texturePath;
 			if (AI_SUCCESS == material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath))
 			{
@@ -385,25 +397,34 @@ void ModelDraw(MODEL* model, XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale, const X
 		XMConvertToRadians(rot.z));
 	XMMATRIX ScalingMatrix = XMMatrixScaling(scale.x, scale.y, scale.z);
 
-	// ワールド行矩の計算(スケール × 回転 × 移動順)
+	// ワールド行列の計算(スケール → 回転 → 移動の順)
 	XMMATRIX World = ScalingMatrix * RotationMatrix * TranslationMatrix;
 
 	// WVP行列の計算
 	XMMATRIX WVP = World * View * Projection;
 
-	// シェーダーに行列をセット
-	Shader_SetMatrix(WVP);           // WVP行列セット
-	Shader_SetWorldMatrix(World);    // ワールド行列セット
+	// シェーダーに行列を設定
+	Shader_SetMatrix(WVP);           // WVP行列を設定
+	Shader_SetWorldMatrix(World);    // ワールド行列を設定
 
-	// シェーダーを使用してパイプライン設定
+	// シェーダーを使用してパイプラインを設定
 	Shader_Begin();
 
-	// プリミティブ・トポロジ設定
+	// プリミティブ・トポロジーを設定
 	Direct3D_GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// ルートノードから再帰的に描画開始(座標変換は単位行列)
+	// ルートノードから再帰的に描画開始(変換はスケール行列)
+	// colorが渡されなかった場合（デフォルト）は白色を確保
+	XMFLOAT4 finalColor = color;
+	
+	// カラーの値が無効な場合（全て0など）は白にリセット
+	if (finalColor.x == 0.0f && finalColor.y == 0.0f && finalColor.z == 0.0f)
+	{
+		finalColor = XMFLOAT4(1.0f, 1.0f, 1.0f, finalColor.w > 0.0f ? finalColor.w : 1.0f);
+	}
+	
 	XMMATRIX identity = XMMatrixIdentity();
-	RenderNode(model, model->AiScene->mRootNode, identity, color, useColorReplace);
+	RenderNode(model, model->AiScene->mRootNode, identity, finalColor, useColorReplace);
 }
 
 XMFLOAT3 ModelGetSize(MODEL* model)
