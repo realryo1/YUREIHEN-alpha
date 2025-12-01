@@ -34,9 +34,9 @@ void Game_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	MainLight = new Light
 	(TRUE,
-		XMFLOAT4(0.0f, -1.0f, -1.0f, 1.0f),	// ライト方向（下向き）
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),	// ディフューズ色（白）
-		XMFLOAT4(0.6f, 0.6f, 0.6f, 1.0f)	// アンビエント光（環境光を強化）
+		XMFLOAT4(0.0f, -10.0f, -10.0f, 1.0f),	//向き
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),	//光の色
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f)	//環境光
 	);
 
 	Camera_Initialize();

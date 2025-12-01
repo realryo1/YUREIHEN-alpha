@@ -72,9 +72,9 @@ void SetBlendState(BLENDSTATE blend);
 using namespace DirectX;
 struct Vertex3D
 {
-	XMFLOAT3 position; // 頂点座標  //XMFLOAT3に変更
+	XMFLOAT3 position; // 頂点座標  //XMFLOAT3へ変更
 	XMFLOAT3 normal;
-	XMFLOAT4 color;		//頂点カラー(R,G,B,A)
+	XMFLOAT4 color;		//頂点カラー（R,G,B,A）
 	XMFLOAT2 texCoord;	//テクスチャ座標
 };
 
@@ -82,21 +82,17 @@ class Light
 {
 protected:
 	BOOL enable;	//ライトの有効無効
-	BOOL dummy[3];	// パディング（HLSL側のbool3と同期）
-	XMFLOAT4 direction;	//ライトの方向(正規化が必要な場合がある)
+	BOOL dummy[3];
+	XMFLOAT4 direction;	//ライトの向き（正規化する必要がある）
 	XMFLOAT4 diffuse;	//光の色
 	XMFLOAT4 ambient;	//環境光
 public:
 	Light(BOOL e, XMFLOAT4 direction, XMFLOAT4 diffuse, XMFLOAT4 ambient)
-		: enable(e), dummy{0, 0, 0}, diffuse(diffuse), ambient(ambient) {
-		// ライト方向を正規化
-		float len = sqrtf(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
-		if (len > 0.0f)
-		{
-			direction.x /= len;
-			direction.y /= len;
-			direction.z /= len;
-		}
+		: enable(e),dummy(), diffuse(diffuse), ambient(ambient) {
+		static float len = sqrtf(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+		direction.x /= len;
+		direction.y /= len;
+		direction.z /= len;
 		this->direction = direction;
 	}
 

@@ -50,9 +50,6 @@ float4 main(PS_INPUT ps_in) : SV_TARGET
     // ベースカラー = テクスチャカラー × マテリアルカラー × 頂点カラー
     float4 baseColor = texColor * materialColorSafe * ps_in.color;
     
-    // デフォルトのアンビエント光（最低限の明るさ）
-    float3 ambientColor = float3(0.3f, 0.3f, 0.3f);
-    
     // ライティング計算（Lambert）
     if (Light.enable)
     {
@@ -68,16 +65,11 @@ float4 main(PS_INPUT ps_in) : SV_TARGET
         // ディフューズライティング
         float3 diffuse = lambert * Light.Diffuse.rgb;
         
-        // アンビエント（環境光）
+        // アンビエント（環境光）の追加
         float3 ambient = Light.Ambient.rgb;
         
         // 最終的なライティングカラーの算出
         baseColor.rgb *= (diffuse + ambient);
-    }
-    else
-    {
-        // ライトが無効な場合でも最低限のアンビエント光を適用
-        baseColor.rgb *= ambientColor;
     }
     
     return baseColor;

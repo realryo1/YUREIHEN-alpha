@@ -65,12 +65,14 @@ void RenderNode(MODEL* model, aiNode* node, XMMATRIX parentTransform, const XMFL
 		}
 		else
 		{
-			// 色を乗算（元の動作）
+			// ライト計算を有効化する処理
+			// マテリアル色が黒い場合は白にリセット
 			if (meshIndex < model->AiScene->mNumMeshes && model->MeshMaterials)
 			{
 				XMFLOAT4 meshColor = model->MeshMaterials[meshIndex].diffuseColor;
 				
-				// メッシュの色が黒い場合は白にリセット（暗くならないようにするため）
+				// 【重要】メッシュの色が黒い場合は必ず白にリセット
+				// これによりライトが正しく反映される
 				if (meshColor.x == 0.0f && meshColor.y == 0.0f && meshColor.z == 0.0f)
 				{
 					meshColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -417,10 +419,10 @@ void ModelDraw(MODEL* model, XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale, const X
 	// colorが渡されなかった場合（デフォルト）は白色を確保
 	XMFLOAT4 finalColor = color;
 	
-	// カラーの値が無効な場合（全て0など）は白にリセット
-	if (finalColor.x == 0.0f && finalColor.y == 0.0f && finalColor.z == 0.0f)
+	// カラー変更を使用していないなら白に固定
+	if (!useColorReplace)
 	{
-		finalColor = XMFLOAT4(1.0f, 1.0f, 1.0f, finalColor.w > 0.0f ? finalColor.w : 1.0f);
+		finalColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
 	XMMATRIX identity = XMMatrixIdentity();

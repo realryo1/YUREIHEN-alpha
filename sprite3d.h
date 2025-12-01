@@ -27,6 +27,14 @@ public:
 		m_ModelSize = ModelGetSize(m_Model);
 		m_OriginalColor = ModelGetAverageMaterialColor(m_Model);
 
+		// 【重要】モデルマテリアルカラーが黒い場合は必ず白にリセット
+		// これにより Ghost と Furniture が真っ黒に表示されることを防ぐ
+		if (m_OriginalColor.x == 0.0f && m_OriginalColor.y == 0.0f && m_OriginalColor.z == 0.0f)
+		{
+			m_OriginalColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			hal::dout << "Warning: Model material color was black, reset to white" << std::endl;
+		}
+
 		//サイズをデバッグ出力
 		hal::dout << "Model Size: (" << m_ModelSize.x << ", " << m_ModelSize.y << ", " << m_ModelSize.z << ")" << std::endl;
 	}
@@ -41,15 +49,21 @@ public:
 		{
 			// 使用する色を決定
 			XMFLOAT4 drawColor = m_UseOriginalColor ? m_OriginalColor : m_Color;
+			//XMFLOAT4 drawColor = m_OriginalColor;
 
-			// モデル描画
+			// ライト計算の有効化判定
+			// m_UseOriginalColor = true（ResetColor後）のときは useColorReplace = false（ライト有効）
+			// m_UseOriginalColor = false（SetColor後）のときは useColorReplace = true（色置き換え）
+			bool shouldApplyColorReplace = !m_UseOriginalColor;
+
+			// モデルを描画
 			ModelDraw(
 				m_Model,
 				GetPos(),
 				GetRot(),
 				GetScale(),
-				drawColor,    // 現在の色または元の色を使用
-				m_UseOriginalColor ? false : true  // useColorReplace（カスタム色が設定されている場合はtrue）
+				drawColor,
+				shouldApplyColorReplace
 			);
 		}
 		else
