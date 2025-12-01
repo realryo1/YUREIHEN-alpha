@@ -11,13 +11,14 @@
 #include "busters.h"
 #include "UI.h"
 #include "UI_scarecombo.h"
+#include "define.h"
 
 Ghost* g_Ghost = NULL;
 
 void Ghost_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	g_Ghost = new Ghost(
-		{ 0.0f, Ghost::GetGhostPosY(), -10.0f },	//位置　終わってる初期化
+		{ -3.0f, Ghost::GetGhostPosY(), -10.0f },	//位置　終わってる初期化
 		{ 1.0f, 1.0f, 1.0f },					//スケール
 		{ 0.0f, 180.0f, 0.0f },					//回転（度）
 		"asset\\model\\ghost.fbx"				//モデルパス
@@ -62,38 +63,37 @@ void Ghost_Finalize(void)
 
 void Ghost::UpdateFurnitureDetection(void)
 {
-	// Ghost近くのFurnitureを探索して色を変更
+	float tempDistance = 999999.0f;
+	int tempInRangeNum = -1;
+
+	// Ghost最近傍のFurnitureを探索
 	for (int i = 0; i < FURNITURE_NUM; i++)
 	{
 		Furniture* pFurniture = GetFurniture(i);
 		if (pFurniture)
 		{
-			// Ghost と Furniture の距離を計算
-			XMFLOAT3 furniturePos = pFurniture->GetPos();
-			XMFLOAT3 ghostPos = GetPos();
-			XMVECTOR ghostVec = XMLoadFloat3(&ghostPos);
-			XMVECTOR furnitureVec = XMLoadFloat3(&furniturePos);
-			XMVECTOR distVec = XMVectorSubtract(furnitureVec, ghostVec);
-			float distance = XMVectorGetX(XMVector3Length(distVec));
+			pFurniture->ResetColor();  // 元の色に戻す
 
-			// 距離が検出範囲内なら黄色、範囲外なら元の色に戻す
-			if (distance <= FURNITURE_DETECTION_RANGE)
+			// 距離が検出範囲内かつ一時保存された家具との距離より近い場合
+			if (pFurniture->GetDistanceToGhost() <= FURNITURE_DETECTION_RANGE &&
+				pFurniture->GetDistanceToGhost() < tempDistance)
 			{
-				pFurniture->SetColor(1.0f, 1.0f, 0.0f, 1.0f);  // 黄色
-				m_InRangeFurnitureNum = i;
+				tempDistance = pFurniture->GetDistanceToGhost();
+				tempInRangeNum = i;
 			}
-			else
-			{
-				pFurniture->ResetColor();  // 元の色に戻す
+		}
+	}
 
-				// 何かしら検知されていたらリセットしない
-				// 遅い番号のものに上書きされてしまう
-				// ghostと家具の距離を家具側に持たせておいて、一番近いものにする変更が望ましい？？
-				if (m_InRangeFurnitureNum == -1)
-				{
-					m_InRangeFurnitureNum = -1;
-				}
-			}
+	// 最も近い家具を変身対象とする
+	if(tempInRangeNum != -1)
+	{
+		m_InRangeFurnitureNum = tempInRangeNum;
+
+		//検出範囲内の家具がある場合、その家具の色を変える
+		Furniture* pFurniture = GetFurniture(m_InRangeFurnitureNum);
+		if (pFurniture)
+		{
+			pFurniture->SetColor(1.0f, 1.0f, 0.0f, 1.0f);  // 黄色
 		}
 	}
 }
@@ -128,7 +128,6 @@ void Ghost::UpdateInput(void)
 			SetPos(pFurniture->GetPos());
 		}
 
-
 		// 恐怖アクション　スペースキーでジャンプ
 		if (Keyboard_IsKeyDownTrigger(KK_SPACE))
 		{
@@ -145,11 +144,11 @@ void Ghost::UpdateInput(void)
 		float distance = XMVectorGetX(XMVector3Length(distVec));
 
 		//距離が一定以下なら驚かせる
-		if (distance <= 6.0f)
+		if (distance <= SCARE_RANGE)
 		{
 			//レンジに入っているなら色を変える
-			GetBusters()->SetColor(0.0f, 1.0f, 0.0f, 1.0f); // 赤色
-
+			GetBusters()->SetIsGhostDiscover(true);
+				
 			// 恐怖アクション　スペースキーでジャンプ
 			if (Keyboard_IsKeyDownTrigger(KK_SPACE))
 			{
@@ -162,8 +161,24 @@ void Ghost::UpdateInput(void)
 		}
 		else
 		{
-			GetBusters()->ResetColor();
+			GetBusters()->SetIsGhostDiscover(false);
 		}
+	}
+
+	// m_IsDetectedByBusterがtrueの場合かつ変身中でないとき、1秒につきマイナス1する
+	if (m_IsDetectedByBuster && !m_IsTransformed)
+	{
+		m_DetectionTimer += 1.0f / 60.0f;  // 1フレームの時間を加算（60FPS想定）
+		
+		if (m_DetectionTimer >= 0.5f)
+		{
+			AddScareGauge(-2.0f);  // マイナス1を恐怖ゲージに加算
+			m_DetectionTimer -= 0.5f;  // 1秒分を引く
+		}
+	}
+	else
+	{
+		m_DetectionTimer = 0.0f;  // フラグがfalseになったらタイマーをリセット
 	}
 }
 
@@ -189,22 +204,22 @@ void Ghost::UpdateMovement(void)
 	// W: 前方移動（カメラの向き）
 	if (Keyboard_IsKeyDown(KK_W))
 	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(forwardX * ACCELERATION, 0.0f, forwardZ * ACCELERATION, 0.0f));
+		accelVec = XMVectorAdd(accelVec, XMVectorSet(forwardX * GHOST_ACCELERATION, 0.0f, forwardZ * GHOST_ACCELERATION, 0.0f));
 	}
 	// S: 後方移動
 	if (Keyboard_IsKeyDown(KK_S))
 	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(-forwardX * ACCELERATION, 0.0f, -forwardZ * ACCELERATION, 0.0f));
+		accelVec = XMVectorAdd(accelVec, XMVectorSet(-forwardX * GHOST_ACCELERATION, 0.0f, -forwardZ * GHOST_ACCELERATION, 0.0f));
 	}
 	// D: 右移動
 	if (Keyboard_IsKeyDown(KK_D))
 	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(rightX * ACCELERATION, 0.0f, rightZ * ACCELERATION, 0.0f));
+		accelVec = XMVectorAdd(accelVec, XMVectorSet(rightX * GHOST_ACCELERATION, 0.0f, rightZ * GHOST_ACCELERATION, 0.0f));
 	}
 	// A: 左移動
 	if (Keyboard_IsKeyDown(KK_A))
 	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(-rightX * ACCELERATION, 0.0f, -rightZ * ACCELERATION, 0.0f));
+		accelVec = XMVectorAdd(accelVec, XMVectorSet(-rightX * GHOST_ACCELERATION, 0.0f, -rightZ * GHOST_ACCELERATION, 0.0f));
 	}
 
 	// 速度を更新（加速度を適用）
@@ -213,15 +228,15 @@ void Ghost::UpdateMovement(void)
 
 	// 速度の大きさを制限
 	float speed = XMVectorGetX(XMVector3Length(velocityVec));
-	if (speed > MAX_SPEED)
+	if (speed > GHOST_MAX_SPEED)
 	{
-		velocityVec = XMVectorScale(velocityVec, MAX_SPEED / speed);
+		velocityVec = XMVectorScale(velocityVec, GHOST_MAX_SPEED / speed);
 	}
 
 	// 入力がない場合は減速
 	if (XMVectorGetX(accelVec) == 0.0f && XMVectorGetY(accelVec) == 0.0f && XMVectorGetZ(accelVec) == 0.0f)
 	{
-		velocityVec = XMVectorScale(velocityVec, DECELERATION);
+		velocityVec = XMVectorScale(velocityVec, GHOST_DECELERATION);
 	}
 
 	XMStoreFloat3(&m_Velocity, velocityVec);
@@ -252,4 +267,10 @@ void Ghost::ResetState(void)
 	m_Velocity = { 0.0f, 0.0f, 0.0f };
 	m_InRangeFurnitureNum = -1;
 	m_IsTransformed = false;
+}
+
+//ghostのゲッター
+Ghost* GetGhost(void)
+{
+	return g_Ghost;
 }

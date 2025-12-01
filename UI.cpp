@@ -66,11 +66,11 @@ void UI_Update(void)
 		StartFade(SCENE_ANM_WIN);
 	}
 
-	// 時計の時間を更新
-	if (g_Clock->Update())
+	// 時計が終わるか、スコアが０なら負けアニメーションへ移行
+	if (g_Clock->Update() || g_ScareGauge->GetValue() <= 0.0f)
 	{
 		//デバッグ用
-		hal::dout << "タイマーが終了しました　負けアニメーションを再生します" << std::endl;
+		hal::dout << "負けアニメーションを再生します" << std::endl;
 		StartFade(SCENE_ANM_LOSE);
 	}
 

@@ -93,7 +93,7 @@ public:
 	Gauge(const XMFLOAT2& pos, const XMFLOAT2& size, const XMFLOAT4& col, BLENDSTATE bstate, const wchar_t* texturePath,
 		int divideX, int divideY, float minValue, float maxValue, int gaugeTexNum = 1, int bgTexNum = 0)
 		: SplitSprite(pos, size, 0.0f, col, bstate, texturePath, divideX, divideY),
-		m_Value(maxValue / 3), m_MaxValue(maxValue), m_MinValue(minValue)
+		m_Value(maxValue / 2), m_MaxValue(maxValue), m_MinValue(minValue)
 	{
 	}
 
