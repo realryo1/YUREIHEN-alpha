@@ -99,6 +99,7 @@ void UI_Update(void)
 	{
 		SetScene(SCENE_ANM_LOSE);//Debug用に負けアニメーションへ直接飛ぶ
 		return;
+
 	}
 
 
