@@ -59,4 +59,6 @@ void Furniture_Finalize(void);
 Furniture* GetFurniture(int index);
 
 // ƒWƒƒƒ“ƒvŠÖ”
-void FurnitureScare(int index);
+bool FurnitureScareStart(int index);
+
+bool FurnitureScareEnded(int index);

@@ -355,16 +355,17 @@ public:
 class Jump
 {
 protected:
-	bool m_IsJumping;           // ジャンプ中フラグ
 	float m_JumpVelocityY;      // Y方向の速度
 	float m_Gravity;            // 重力加速度
 	float m_JumpPower;          // ジャンプ力
 	float m_GroundLevel;        // 地面の高さ
+	bool m_IsJumping;           // ジャンプ中フラグ
+	bool m_IsJumpEnded;         // ジャンプ終了フラグ
 
 public:
 	Jump(float gravity = 0.01f, float jumpPower = 0.2f, float groundLevel = 1.0f)
 		: m_IsJumping(false), m_JumpVelocityY(0.0f), m_Gravity(gravity), 
-		  m_JumpPower(jumpPower), m_GroundLevel(groundLevel)
+		m_JumpPower(jumpPower), m_GroundLevel(groundLevel), m_IsJumpEnded(true)
 	{
 	}
 
@@ -375,6 +376,7 @@ public:
 	{
 		if (!m_IsJumping)
 		{
+			m_IsJumpEnded = false;
 			m_IsJumping = true;
 			m_JumpVelocityY = m_JumpPower;
 		}
@@ -399,6 +401,7 @@ public:
 				pos.y = m_GroundLevel;
 				transform.SetPos(pos);
 				m_IsJumping = false;
+				m_IsJumpEnded = true;
 				m_JumpVelocityY = 0.0f;
 			}
 		}
@@ -408,6 +411,12 @@ public:
 	bool GetIsJumping(void) const
 	{
 		return m_IsJumping;
+	}
+
+	// ジャンプ終了したかどうかを取得
+	bool GetIsJumpEnded(void) const
+	{
+		return m_IsJumpEnded;
 	}
 
 	// ジャンプ速度を取得

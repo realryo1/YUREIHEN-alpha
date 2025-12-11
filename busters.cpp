@@ -129,9 +129,13 @@ void Busters::CheckState(void)
 
 	// Ghostが変身していない、かつ一定距離内なら発見
 	// ※変身中でも「移動した瞬間」などを見破るロジックを後で入れても面白い
-	if (!ghost->GetIsTransformed() && m_DistanceToGhost < BUSTERS_PATROL_RANGH)
+	if (ghost->GetState() == GS_MOVING ||
+		ghost->GetState() == GS_FURNITURE_FOUND)
 	{
-		isFound = true;
+		if (m_DistanceToGhost < BUSTERS_PATROL_RANGH)
+		{
+			isFound = true;
+		}
 	}
 
 	// 状態遷移
@@ -234,11 +238,20 @@ void Busters::OnScared(void)
 	// 驚いたときはターゲットをリセットして一時停止
 	m_TargetFurnitureIndex = -1;
 	m_WaitTimer = 120; // 2秒間動けなくする
+	this->SetColor(0.0f, 0.0f, 1.0f, 1.0f); // 青色（驚いた）
 }
 
 void Busters::SetIsGhostDiscover(bool discover)
 {
-	// 外部からの色変更要求などはここ
+	// trueならMaterial色を緑にする
+	if (discover)
+	{
+		this->SetColor(0.0f, 1.0f, 0.0f, 1.0f);
+	}
+	else
+	{
+		this->ResetColor();
+	}
 }
 
 // --- グローバル関数 ---
