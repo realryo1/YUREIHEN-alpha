@@ -1,6 +1,8 @@
 #include "scene.h"
 #include "game.h"
 #include "animation.h"
+#include "WinAnim.h"
+#include "LoseAnim.h"
 #include "direct3d.h"
 #include "keyboard.h"
 #include "texture.h"

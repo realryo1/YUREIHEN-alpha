@@ -1,7 +1,7 @@
 ﻿#ifndef NOMINMAX
 #define NOMINMAX
 #endif
-// Logo.cpp
+
 #include "Fade.h"
 #include "shader.h"
 #include "Sprite.h"
@@ -151,7 +151,7 @@ static ID3D11ShaderResourceView* CreateSolidSRV(ID3D11Device* device, uint32_t r
 
 void OpAnim_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    SetFPS(30);
+    SetFPS(40);
 
     // デバイス / コンテキストを保存（描画時に使用）
     g_pDevice = pDevice;
@@ -203,9 +203,10 @@ void OpAnim_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     g_Texture[0] = LoadTexture(L"asset\\yureihen\\yakata_jimen1.png");
     g_Texture[1] = LoadTexture(L"asset\\yureihen\\yurei1.png");
     g_Texture[2] = LoadTexture(L"asset\\yureihen\\basuta1.png");
-    g_Texture[3] = LoadTexture(L"asset\\yureihen\\bikkuri.png"); // bikkuri のファイル名に合わせる
-    g_Texture[4] = LoadTexture(L"asset\\yureihen\\inazuma.png"); // 稲妻テクスチャ
+    g_Texture[3] = LoadTexture(L"asset\\yureihen\\bikkuri.png");
+    g_Texture[4] = LoadTexture(L"asset\\yureihen\\inazuma.png");
 
+    // 問題：配列サイズ4とループ5が不一致。テクスチャは実質4つ
     // LoadTexture が失敗した場合は目印になる 1x1 テクスチャで置き換える（NULL 回避）
     for (int i = 0; i < 4; ++i)
     {
@@ -238,7 +239,7 @@ void OpAnim_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
     // 稲妻初期値
     g_inazumaTimer = 0.0f;
-    g_inazumaNextStrike = 2.0f + Rand01() * 4.0f; // 2..6 秒
+    g_inazumaNextStrike = 1.0f + Rand01() * 2.0f; // 1..3 秒（変更）
     g_inazumaActive = false;
     g_inazumaFlash = 0.0f;
     for (int i = 0; i < 4; ++i) g_inazumaBoltAlphas[i] = 0.0f;
@@ -311,7 +312,7 @@ void OpAnim_Update()
             // ストライク終了、次発生をランダム設定
             g_inazumaActive = false;
             g_inazumaTimer = 0.0f;
-            g_inazumaNextStrike = 1.5f + Rand01() * 6.0f; // 次は 1.5..7.5 秒
+            g_inazumaNextStrike = 0.8f + Rand01() * 2.0f; // 次は 0.8..2.8 秒（変更）
             g_inazumaFlash = 0.0f;
             for (int i = 0; i < 4; ++i) g_inazumaBoltAlphas[i] = 0.0f;
         }
@@ -630,8 +631,8 @@ void OpAnimDraw(void)
         XMFLOAT4 purple = { 0.45f, 0.10f, 0.45f, 1.0f };
         Sprite_Single_Draw(virtualCenter, virtualSize, 0.0f, purple, BLENDSTATE_ALFA, g_SolidTex);
 
-        // 仮想キャンバス外側を黒で塗りつぶしてレターボックス／ピラーボックスを実現
-        XMFLOAT4 black = { 0.0f, 0.0f, 0.0f, 1.0f };
+        // 仮想キャンバス外側を灰色で塗りつぶしてレターボックス／ピラーボックスを実現
+        XMFLOAT4 gray = { 0.5f, 0.5f, 0.5f, 1.0f };
 
         float verticalBorder = (screenHeight - virtualSize.y) * 0.5f;
         float horizontalBorder = (screenWidth - virtualSize.x) * 0.5f;
@@ -641,11 +642,11 @@ void OpAnimDraw(void)
             // 上
             XMFLOAT2 topSize = { screenWidth, verticalBorder };
             XMFLOAT2 topPos = { screenWidth * 0.5f, verticalBorder * 0.5f };
-            Sprite_Single_Draw(topPos, topSize, 0.0f, black, BLENDSTATE_ALFA, g_SolidTex);
+            Sprite_Single_Draw(topPos, topSize, 0.0f, gray, BLENDSTATE_ALFA, g_SolidTex);
 
             // 下
             XMFLOAT2 bottomPos = { screenWidth * 0.5f, screenHeight - verticalBorder * 0.5f };
-            Sprite_Single_Draw(bottomPos, topSize, 0.0f, black, BLENDSTATE_ALFA, g_SolidTex);
+            Sprite_Single_Draw(bottomPos, topSize, 0.0f, gray, BLENDSTATE_ALFA, g_SolidTex);
         }
 
         if (horizontalBorder > 0.0f)
@@ -653,11 +654,11 @@ void OpAnimDraw(void)
             // 左
             XMFLOAT2 leftSize = { horizontalBorder, virtualSize.y };
             XMFLOAT2 leftPos = { horizontalBorder * 0.5f, virtualCenter.y };
-            Sprite_Single_Draw(leftPos, leftSize, 0.0f, black, BLENDSTATE_ALFA, g_SolidTex);
+            Sprite_Single_Draw(leftPos, leftSize, 0.0f, gray, BLENDSTATE_ALFA, g_SolidTex);
 
             // 右
             XMFLOAT2 rightPos = { screenWidth - horizontalBorder * 0.5f, virtualCenter.y };
-            Sprite_Single_Draw(rightPos, leftSize, 0.0f, black, BLENDSTATE_ALFA, g_SolidTex);
+            Sprite_Single_Draw(rightPos, leftSize, 0.0f, gray, BLENDSTATE_ALFA, g_SolidTex);
         }
     }
 

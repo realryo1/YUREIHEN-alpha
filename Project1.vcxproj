@@ -147,6 +147,7 @@
     <ClCompile Include="furniture.cpp" />
     <ClCompile Include="ghost.cpp" />
     <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="LoseAnim.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modeldraw.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="title.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="UI_scarecombo.cpp" />
+    <ClCompile Include="WinAnim.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h" />
@@ -176,6 +178,7 @@
     <ClInclude Include="furniture.h" />
     <ClInclude Include="ghost.h" />
     <ClInclude Include="keyboard.h" />
+    <ClInclude Include="LoseAnim.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modeldraw.h" />
@@ -191,6 +194,7 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="UI_scarecombo.h" />
+    <ClInclude Include="WinAnim.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shader_pixel_2d.hlsl">
