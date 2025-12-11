@@ -26,7 +26,6 @@ private:
 	float m_FloorCooldown;		// 階段移動のクールタイム
 	bool m_IsTransformed;		// 変身しているか
 	bool m_IsDetectedByBuster;	// bustarに発見されたか
-  float m_FloorCooldown;		// 階層移動のクールダウンタイマー
 	bool m_IsDraw;				// 描画フラグ
 
 public:

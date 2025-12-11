@@ -121,8 +121,8 @@ void Busters::CheckState(void)
 	m_DistanceToGhost = XMVectorGetX(XMVector3Length(XMVectorSubtract(ghostVec, myVec)));
 
 	// 変身中は気づかない
-	if (ghost->GetState() == GS_MOVING ||
-		ghost->GetState() == GS_FURNITURE_FOUND)
+	if (ghost->GetState() == GS_TRANSFORM ||
+		ghost->GetState() == GS_SCARE)
 	{
 		if (m_State != BUSTERS_SEARCH)
 		{
@@ -131,6 +131,7 @@ void Busters::CheckState(void)
 			ghost->SetIsDetectedByBuster(false);
 			m_WaitTimer = 60;
 		}
+
 		return;
 	}
 

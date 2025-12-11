@@ -175,8 +175,7 @@ void UI_Update(void)
 		return;
 
 	}
-
-
+	
 	//恐怖ゲージが最大なら勝利シーンへ移行（デバッグ用）
 	if (g_ScareGauge->GetValue() >= g_ScareGauge->GetMaxValue())
 	{
@@ -191,7 +190,7 @@ void UI_Update(void)
 	}
 
 	UI_ScareCombo_Update();
-	g_FloorNumber->SetNumber(currentFloor + 1);
+	g_FloorNumber->SetNumber(Field_GetCurrentFloor() + 1);
 
 	// --- 階段ガイドの制御 ---
 	bool onStairs = false;
