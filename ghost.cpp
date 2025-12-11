@@ -135,6 +135,7 @@ void Ghost::UpdateInput(void)
 		{
 			//家具とプレイヤーをジャンプさせる
 			FurnitureScare(m_InRangeFurnitureNum);
+
 		}
 
 		// Ghost（Furniture） と buster の距離を計算
@@ -170,11 +171,11 @@ void Ghost::UpdateInput(void)
 	// m_IsDetectedByBusterがtrueの場合かつ変身中でないとき、1秒につきマイナス1する
 	if (m_IsDetectedByBuster && !m_IsTransformed)
 	{
-		m_DetectionTimer += 1.0f / 60.0f;  // 1フレームの時間を加算（60FPS想定）
+		m_DetectionTimer += 1.0f / 60.0f;  // 1フレームの時間を加算
 		
 		if (m_DetectionTimer >= 0.5f)
 		{
-			AddScareGauge(-2.0f);  // マイナス1を恐怖ゲージに加算
+			AddScareGauge(-0.5f);  // マイナス1を恐怖ゲージに加算
 			m_DetectionTimer -= 0.5f;  // 1秒分を引く
 		}
 	}
@@ -192,56 +193,36 @@ void Ghost::UpdateMovement(void)
 		m_FloorCooldown -= 1.0f / 60.0f;
 	}
 
-	// 変身していないときのみ移動可能
+
 	if (m_IsTransformed)
 		return;
 
-	// カメラのヨー角を取得
+	// --- 入力と加速処理 (ここはそのまま) ---
 	float cameraYaw = Camera_GetYaw();
 	float yawRad = XMConvertToRadians(cameraYaw);
-
-	// カメラの向きに基づいた方向ベクトル
 	float forwardX = sinf(yawRad);
 	float forwardZ = cosf(yawRad);
 	float rightX = cosf(yawRad);
 	float rightZ = -sinf(yawRad);
 
-	// 入力による加速度ベクトル
 	XMVECTOR accelVec = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// W: 前方移動（カメラの向き）
-	if (Keyboard_IsKeyDown(KK_W))
-	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(forwardX * GHOST_ACCELERATION, 0.0f, forwardZ * GHOST_ACCELERATION, 0.0f));
-	}
-	// S: 後方移動
-	if (Keyboard_IsKeyDown(KK_S))
-	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(-forwardX * GHOST_ACCELERATION, 0.0f, -forwardZ * GHOST_ACCELERATION, 0.0f));
-	}
-	// D: 右移動
-	if (Keyboard_IsKeyDown(KK_D))
-	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(rightX * GHOST_ACCELERATION, 0.0f, rightZ * GHOST_ACCELERATION, 0.0f));
-	}
-	// A: 左移動
-	if (Keyboard_IsKeyDown(KK_A))
-	{
-		accelVec = XMVectorAdd(accelVec, XMVectorSet(-rightX * GHOST_ACCELERATION, 0.0f, -rightZ * GHOST_ACCELERATION, 0.0f));
-	}
+	if (Keyboard_IsKeyDown(KK_W)) accelVec = XMVectorAdd(accelVec, XMVectorSet(forwardX * GHOST_ACCELERATION, 0.0f, forwardZ * GHOST_ACCELERATION, 0.0f));
+	if (Keyboard_IsKeyDown(KK_S)) accelVec = XMVectorAdd(accelVec, XMVectorSet(-forwardX * GHOST_ACCELERATION, 0.0f, -forwardZ * GHOST_ACCELERATION, 0.0f));
+	if (Keyboard_IsKeyDown(KK_D)) accelVec = XMVectorAdd(accelVec, XMVectorSet(rightX * GHOST_ACCELERATION, 0.0f, rightZ * GHOST_ACCELERATION, 0.0f));
+	if (Keyboard_IsKeyDown(KK_A)) accelVec = XMVectorAdd(accelVec, XMVectorSet(-rightX * GHOST_ACCELERATION, 0.0f, -rightZ * GHOST_ACCELERATION, 0.0f));
 
-	// 速度を更新（加速度を適用）
 	XMVECTOR velocityVec = XMLoadFloat3(&m_Velocity);
 	velocityVec = XMVectorAdd(velocityVec, accelVec);
 
-	// 速度の大きさを制限
+	// 速度制限
 	float speed = XMVectorGetX(XMVector3Length(velocityVec));
 	if (speed > GHOST_MAX_SPEED)
 	{
 		velocityVec = XMVectorScale(velocityVec, GHOST_MAX_SPEED / speed);
 	}
 
-	// 入力がない場合は減速
+	// 減速
 	if (XMVectorGetX(accelVec) == 0.0f && XMVectorGetY(accelVec) == 0.0f && XMVectorGetZ(accelVec) == 0.0f)
 	{
 		velocityVec = XMVectorScale(velocityVec, GHOST_DECELERATION);
@@ -249,11 +230,10 @@ void Ghost::UpdateMovement(void)
 
 	XMStoreFloat3(&m_Velocity, velocityVec);
 
-	// 水平方向（XZ）の移動ベクトルから Ghost の向きを決定
+	// 向きの変更
 	float moveVecX = m_Velocity.x;
 	float moveVecZ = m_Velocity.z;
 
-	// 水平方向の速度が0でない場合、その方向を向く
 	if (moveVecX != 0.0f || moveVecZ != 0.0f)
 	{
 		float moveAngle = atan2f(moveVecX, moveVecZ);
@@ -261,52 +241,94 @@ void Ghost::UpdateMovement(void)
 		SetRot({ 0.0f, moveYaw - 180.0f, 0.0f });
 	}
 
-	// Ghost位置を更新
-	XMFLOAT3 ghostPos = GetPos();
-	XMVECTOR posVec = XMLoadFloat3(&ghostPos);
-	posVec = XMVectorAdd(posVec, velocityVec);
-	XMFLOAT3 newPos;
-	XMStoreFloat3(&newPos, posVec);
-	SetPos(newPos);
 
+	// =========================================================
+	// 壁当たり判定 (Collision)
+	// =========================================================
+
+	// 当たり判定の半径 
+	float r = 0.4f;
+
+	// --- X軸の移動と判定 ---
+	float nextX = m_Position.x + m_Velocity.x;
+	bool hitX = false;
+
+	if (Field_IsOuterWall(nextX + r, m_Position.z + r) ||
+		Field_IsOuterWall(nextX + r, m_Position.z - r) ||
+		Field_IsOuterWall(nextX - r, m_Position.z + r) ||
+		Field_IsOuterWall(nextX - r, m_Position.z - r))
+	{
+		hitX = true;
+	}
+
+	if (hitX) m_Velocity.x = 0.0f;
+	else m_Position.x = nextX;
+
+	// --- Z軸の移動と判定 ---
+	float nextZ = m_Position.z + m_Velocity.z;
+	bool hitZ = false;
+
+	if (Field_IsOuterWall(m_Position.x + r, nextZ + r) ||
+		Field_IsOuterWall(m_Position.x + r, nextZ - r) ||
+		Field_IsOuterWall(m_Position.x - r, nextZ + r) ||
+		Field_IsOuterWall(m_Position.x - r, nextZ - r))
+	{
+		hitZ = true;
+	}
+
+	if (hitZ) m_Velocity.z = 0.0f;
+	else m_Position.z = nextZ;
+
+	SetPos(m_Position);
+
+	// =========================================================
+	// 階段判定と移動処理 (既存コード)
+	// =========================================================
 	if (m_FloorCooldown <= 0.0f)
 	{
 		FIELD_TYPE blockType = Field_GetBlockType(m_Position.x, m_Position.z);
 
-		// 階段の上にいる場合のみマウス判定を行う
 		if (blockType == FIELD_STAIRS_UP || blockType == FIELD_STAIRS_DOWN)
 		{
-			// マウスの状態を取得
-			Mouse_State mouseState;
-			Mouse_GetState(&mouseState);
+			// 色変え
+			if (m_FloorCooldown > 0.0f) SetColor(1.0f, 0.5f, 0.5f, 1.0f);
+			else SetColor(0.7f, 1.0f, 0.7f, 1.0f);
 
-			// 左クリックが押されているなら移動実行
-			if (mouseState.leftButton)
+			bool isClicked = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+
+			if (isClicked)
 			{
 				if (blockType == FIELD_STAIRS_UP)
 				{
 					int currentFloor = Field_GetCurrentFloor();
-					Field_ChangeFloor(currentFloor + 1);
-
-					// 位置ずらし + クールダウン設定
-					m_Position.z += 2.0f;
-					SetPos(m_Position);
-					m_FloorCooldown = 2.0f; // 2秒間移動禁止
+					if (currentFloor < MAP_FLOORS - 1)
+					{
+						Field_ChangeFloor(currentFloor + 1);
+						m_Position.z += 1.2f;
+						SetPos(m_Position);
+						m_FloorCooldown = FLOOR_COOLDOWN_TIME;
+					}
 				}
 				else if (blockType == FIELD_STAIRS_DOWN)
 				{
 					int currentFloor = Field_GetCurrentFloor();
-					Field_ChangeFloor(currentFloor - 1);
-
-					// 位置ずらし + クールダウン設定
-					m_Position.z -= 2.0f;
-					SetPos(m_Position);
-					m_FloorCooldown = 2.0f; // 2秒間移動禁止
+					if (currentFloor > 0)
+					{
+						Field_ChangeFloor(currentFloor - 1);
+						m_Position.z -= 1.2f;
+						SetPos(m_Position);
+						m_FloorCooldown = FLOOR_COOLDOWN_TIME;
+					}
 				}
 			}
 		}
+		else
+		{
+			ResetColor();
+		}
 	}
 }
+
 void Ghost::ResetState(void)
 {
 	m_Velocity = { 0.0f, 0.0f, 0.0f };

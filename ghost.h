@@ -16,7 +16,8 @@ private:
 	bool m_IsTransformed;		// 変身しているか
 	bool m_IsDetectedByBuster;	// bustarに発見されたか
 	float m_DetectionTimer;		// 発見状態のタイマー（1秒につきマイナス1するため）
-	float m_FloorCooldown;
+    float m_FloorCooldown;		// 階層移動のクールダウンタイマー
+
 
 public:
 	Ghost(const XMFLOAT3& pos, const XMFLOAT3& scale, const XMFLOAT3& rot, const char* pass)
@@ -25,7 +26,8 @@ public:
 		m_InRangeFurnitureNum(-1),
 		m_IsTransformed(false),
 		m_IsDetectedByBuster(false),
-		m_DetectionTimer(0.0f)
+		m_DetectionTimer(0.0f),
+        m_FloorCooldown(0.0f)
 	{
 	}
 
