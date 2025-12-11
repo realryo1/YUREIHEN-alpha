@@ -21,6 +21,7 @@ using namespace DirectX;
 #include "ghost.h"
 #include "furniture.h"
 #include "busters.h"
+#include "debugdraw.h"
 
 Light* MainLight;
 
@@ -45,6 +46,7 @@ void Game_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	UI_Initialize();
 	Furniture_Initialize();
 	Busters_Initialize();
+	DebugDraw_Initialize();
 }
 
 void Game_Update(void)
@@ -55,6 +57,7 @@ void Game_Update(void)
 	UI_Update();
 	Furniture_Update();
 	Busters_Update();
+	DebugDraw_Update();
 }
 
 void Game_Draw(void)
@@ -69,6 +72,7 @@ void Game_Draw(void)
 	Ghost_Draw();
 	Furniture_Draw();
 	Busters_Draw();
+	DebugDraw_Draw();
 
 	SetDepthTest(false);
 	MainLight->SetEnable(false);
@@ -88,4 +92,5 @@ void Game_Finalize(void)
 	UI_Finalize();
 	Furniture_Finalize();
 	Busters_Finalize();
+	DebugDraw_Finalize();
 }

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <float.h>
 #include <algorithm>
+#include <map>
 
 using namespace DirectX;
 
@@ -227,10 +228,10 @@ MODEL* ModelLoad(const char* FileName)
 
 			D3D11_BUFFER_DESC bd;
 			ZeroMemory(&bd, sizeof(bd));
-			bd.Usage = D3D11_USAGE_DYNAMIC;
+			bd.Usage = D3D11_USAGE_DYNAMIC;  // 動的更新対応に変更
 			bd.ByteWidth = sizeof(Vertex3D) * mesh->mNumVertices;
 			bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;  // CPU書き込み対応
 
 			D3D11_SUBRESOURCE_DATA sd;
 			ZeroMemory(&sd, sizeof(sd));
@@ -250,7 +251,8 @@ MODEL* ModelLoad(const char* FileName)
 			std::cout << "Mesh " << m << " created: " 
 					  << mesh->mNumVertices << " vertices, "
 					  << (mesh->HasNormals() ? "WITH" : "WITHOUT") << " normals, "
-					  << (mesh->HasTextureCoords(0) ? "WITH" : "WITHOUT") << " UVs" << std::endl;
+					  << (mesh->HasTextureCoords(0) ? "WITH" : "WITHOUT") << " UVs" 
+					  << (mesh->HasBones() ? ", WITH bones" : "") << std::endl;
 		}
 
 		// インデックスバッファ生成
@@ -446,81 +448,392 @@ void ModelDraw(MODEL* model, XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale, const X
 	RenderNode(model, model->AiScene->mRootNode, identity, finalColor, useColorReplace);
 }
 
-XMFLOAT3 ModelGetSize(MODEL* model)
+// アニメーション対応のノード描画関数（ノード変換適用版）
+void RenderNodeAnimation(MODEL* model, aiNode* node, XMMATRIX parentTransform, const BoneMatrices& boneMatrices, const XMFLOAT4& color, bool useColorReplace = false, XMMATRIX worldTransform = XMMatrixIdentity())
 {
-	if (!model || !model->AiScene || model->AiScene->mNumMeshes == 0)
+	// このノードのローカル変換行列と親の変換を組み合わせ
+	XMMATRIX currentTransform = AiMatrixToXMMatrix(node->mTransformation) * parentTransform;
+
+	// ノード名がアニメーション対象の場合、ボーン行列を適用
+	// FindBoneIndexで割り当てられたインデックスとノード名から対応を取る
+	int nodeAnimIndex = -1;
+	
+	// ノード名とボーン行列インデックスのマッピング（簡略化）
+	// ExtractAnimationFromAssimpで動的に割り当てられたインデックスを使用
+	static std::map<std::string, int> nodeToMatrixIndex;
+	std::string nodeName(node->mName.data);
+	
+	if (nodeToMatrixIndex.find(nodeName) == nodeToMatrixIndex.end())
 	{
-		return XMFLOAT3(1.0f, 1.0f, 1.0f);  // デフォルトサイズを返す
+		// 最初のアニメーション情報からマッピングを作成
+		if (model && model->AiScene && model->AiScene->mNumAnimations > 0)
+		{
+			aiAnimation* anim = model->AiScene->mAnimations[0];
+			for (unsigned int c = 0; c < anim->mNumChannels; c++)
+			{
+				std::string channelName(anim->mChannels[c]->mNodeName.data);
+				if (channelName == nodeName)
+				{
+					nodeToMatrixIndex[nodeName] = c;
+					break;
+				}
+			}
+		}
+	}
+	
+	if (nodeToMatrixIndex.find(nodeName) != nodeToMatrixIndex.end())
+	{
+		nodeAnimIndex = nodeToMatrixIndex[nodeName];
+		if (nodeAnimIndex >= 0 && nodeAnimIndex < BoneMatrices::MAX_BONES)
+		{
+			// ボーン行列を適用（ノード階層変換の代わりにアニメーション行列を使用）
+			currentTransform = boneMatrices.matrices[nodeAnimIndex] * parentTransform;
+		}
 	}
 
-	// バウンディングボックスの最小・最大座標を計算
-	float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
-	float maxX = -FLT_MAX, maxY = -FLT_MAX, maxZ = -FLT_MAX;
+	// このノード以下のすべてのメッシュを描画
+	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+	{
+		unsigned int meshIndex = node->mMeshes[i];
+		aiMesh* mesh = model->AiScene->mMeshes[meshIndex];
 
-	// すべてのメッシュから頂点を取得してバウンディングボックスを計算
+		// マテリアルの色を計算
+		XMFLOAT4 finalColor;
+		if (useColorReplace)
+		{
+			finalColor = color;
+		}
+		else
+		{
+			if (meshIndex < model->AiScene->mNumMeshes && model->MeshMaterials)
+			{
+				XMFLOAT4 meshColor = model->MeshMaterials[meshIndex].diffuseColor;
+				
+				if (meshColor.x == 0.0f && meshColor.y == 0.0f && meshColor.z == 0.0f)
+				{
+					meshColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+				
+				finalColor = XMFLOAT4(
+					meshColor.x * color.x,
+					meshColor.y * color.y,
+					meshColor.z * color.z,
+					meshColor.w * color.w
+				);
+			}
+			else
+			{
+				finalColor = color;
+			}
+		}
+		
+		Shader_SetMaterialColor(finalColor);
+
+		// テクスチャをシェーダーに設定
+		ID3D11ShaderResourceView* textureToSet = model->MeshMaterials[meshIndex].textureView;
+		Direct3D_GetDeviceContext()->PSSetShaderResources(0, 1, &textureToSet);
+
+		// 頂点バッファ設定
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		Direct3D_GetDeviceContext()->IASetVertexBuffers(0, 1, &model->VertexBuffer[meshIndex], &stride, &offset);
+
+		// インデックスバッファ設定
+		Direct3D_GetDeviceContext()->IASetIndexBuffer(model->IndexBuffer[meshIndex], DXGI_FORMAT_R32_UINT, 0);
+
+		// ワールド行列の設定（アニメーション変換 + モデルワールド変換を組み合わせ）
+		XMMATRIX meshWorldMatrix = currentTransform * worldTransform;
+		Shader_SetWorldMatrix(meshWorldMatrix);
+
+		// WVP行列の計算と設定
+		Camera* pCamera = GetCamera();
+		if (pCamera)
+		{
+			XMMATRIX View = pCamera->GetView();
+			XMMATRIX Projection = pCamera->GetProjection();
+			XMMATRIX WVP = meshWorldMatrix * View * Projection;
+			Shader_SetMatrix(WVP);
+		}
+
+		// 描画
+		Direct3D_GetDeviceContext()->DrawIndexed(model->MeshIndexCounts[meshIndex], 0, 0);
+	}
+
+	// 子ノードを再帰実行
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
+		RenderNodeAnimation(model, node->mChildren[i], currentTransform, boneMatrices, color, useColorReplace, worldTransform);
+	}
+}
+
+// アニメーション対応の描画関数
+void ModelAnimationDraw(MODEL* model, XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale, const BoneMatrices& boneMatrices, const XMFLOAT4& color, bool useColorReplace)
+{
+	if (!model) return;
+
+	// モデルの変換行列（位置、回転、スケール）
+	XMMATRIX TranslationMatrix = XMMatrixTranslation(pos.x, pos.y, pos.z);
+	XMMATRIX RotationMatrix = XMMatrixRotationRollPitchYaw(
+		XMConvertToRadians(rot.x),
+		XMConvertToRadians(rot.y),
+		XMConvertToRadians(rot.z));
+	XMMATRIX ScalingMatrix = XMMatrixScaling(scale.x, scale.y, scale.z);
+
+	// ワールド行列の計算(スケール → 回転 → 移動の順)
+	XMMATRIX worldMatrix = ScalingMatrix * RotationMatrix * TranslationMatrix;
+
+	// シェーダーを使用してパイプラインを設定
+	Shader_Begin();
+
+	// プリミティブ・トポロジーを設定
+	Direct3D_GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// ルートノードから再帰的に描画開始
+	XMFLOAT4 finalColor = color;
+	
+	if (!useColorReplace)
+	{
+		finalColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	
+	XMMATRIX identity = XMMatrixIdentity();
+	RenderNodeAnimation(model, model->AiScene->mRootNode, identity, boneMatrices, finalColor, useColorReplace, worldMatrix);
+}
+
+// ノード毎のボーン行列を取得（アニメーション用）
+// 注意: 既存のmodel.cpp内に RenderNodeAnimation 関数が実装されているため、
+// それを活用する前提で、ModelAnimationDraw を呼び出すようにする
+
+// アニメーション時刻からボーン行列を計算する関数
+void ModelCalculateBoneMatrices(MODEL* model, double animationTime, BoneMatrices& outBoneMatrices)
+{
+	if (!model || !model->AiScene || model->AiScene->mNumAnimations == 0)
+	{
+		// アニメーションが無い場合はアイデンティティ行列を返す
+		outBoneMatrices.boneCount = 0;
+		return;
+	}
+
+	// 最初のアニメーションを使用
+	aiAnimation* animation = model->AiScene->mAnimations[0];
+	
+	// アニメーション時刻を周期的にループ
+	double animDuration = animation->mDuration;
+	double ticksPerSecond = animation->mTicksPerSecond > 0 ? animation->mTicksPerSecond : 24.0;
+	double animationTick = fmod(animationTime * ticksPerSecond, animDuration);
+	if (animationTick < 0) animationTick += animDuration;
+
+	// 各ボーンのアニメーション行列を計算
+	outBoneMatrices.boneCount = 0;
+
+	// シーンのすべてのメッシュをループしてボーン情報を収集
+	for (unsigned int meshIdx = 0; meshIdx < model->AiScene->mNumMeshes; meshIdx++)
+	{
+		aiMesh* mesh = model->AiScene->mMeshes[meshIdx];
+
+		if (!mesh->HasBones()) continue;
+
+		// メッシュのすべてのボーンをループ
+		for (unsigned int boneIdx = 0; boneIdx < mesh->mNumBones; boneIdx++)
+		{
+			aiBone* bone = mesh->mBones[boneIdx];
+
+			if (outBoneMatrices.boneCount >= BoneMatrices::MAX_BONES)
+			{
+				break;  // ボーン数の上限に達した
+			}
+
+			// ボーン名からアニメーションチャネルを検索
+			aiNodeAnim* nodeAnim = nullptr;
+			for (unsigned int chanIdx = 0; chanIdx < animation->mNumChannels; chanIdx++)
+			{
+				if (std::string(animation->mChannels[chanIdx]->mNodeName.data) == bone->mName.data)
+				{
+					nodeAnim = animation->mChannels[chanIdx];
+					break;
+				}
+			}
+
+			if (!nodeAnim)
+			{
+				// このボーンのアニメーションチャネルが無い場合はアイデンティティ行列
+				outBoneMatrices.matrices[outBoneMatrices.boneCount] = XMMatrixIdentity();
+				outBoneMatrices.boneCount++;
+				continue;
+			}
+
+			// 位置、回転、スケールのキーフレームから補間値を取得
+			XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+			XMFLOAT4 rotation = XMFLOAT4(0, 0, 0, 1);  // w は1.0f
+			XMFLOAT3 scale = XMFLOAT3(1, 1, 1);
+
+			// 位置の補間
+			if (nodeAnim->mNumPositionKeys > 0)
+			{
+				int posKeyIdx = 0;
+				for (unsigned int k = 0; k < nodeAnim->mNumPositionKeys - 1; k++)
+				{
+					if (animationTick <= nodeAnim->mPositionKeys[k + 1].mTime)
+					{
+						posKeyIdx = k;
+						break;
+					}
+				}
+
+				aiVectorKey& key1 = nodeAnim->mPositionKeys[posKeyIdx];
+				aiVectorKey& key2 = nodeAnim->mPositionKeys[(posKeyIdx + 1) % nodeAnim->mNumPositionKeys];
+
+				double timeDiff = key2.mTime - key1.mTime;
+				double t = 0.0;
+				if (timeDiff > 0.001)
+				{
+					t = (animationTick - key1.mTime) / timeDiff;
+					t = std::max(0.0, std::min(1.0, t));  // 0-1の範囲でクランプ
+				}
+
+				position.x = key1.mValue.x + (key2.mValue.x - key1.mValue.x) * (float)t;
+				position.y = key1.mValue.y + (key2.mValue.y - key1.mValue.y) * (float)t;
+				position.z = key1.mValue.z + (key2.mValue.z - key1.mValue.z) * (float)t;
+			}
+
+			// 回転の補間（四元数SLERP）
+			if (nodeAnim->mNumRotationKeys > 0)
+			{
+				int rotKeyIdx = 0;
+				for (unsigned int k = 0; k < nodeAnim->mNumRotationKeys - 1; k++)
+				{
+					if (animationTick <= nodeAnim->mRotationKeys[k + 1].mTime)
+					{
+						rotKeyIdx = k;
+						break;
+					}
+				}
+
+				aiQuatKey& key1 = nodeAnim->mRotationKeys[rotKeyIdx];
+				aiQuatKey& key2 = nodeAnim->mRotationKeys[(rotKeyIdx + 1) % nodeAnim->mNumRotationKeys];
+
+				double timeDiff = key2.mTime - key1.mTime;
+				double t = 0.0;
+				if (timeDiff > 0.001)
+				{
+					t = (animationTick - key1.mTime) / timeDiff;
+					t = std::max(0.0, std::min(1.0, t));  // 0-1の範囲でクランプ
+				}
+
+				// 簡易的な線形補間（本来はSLERPを使用すべき）
+				XMVECTOR q1 = XMVectorSet(key1.mValue.x, key1.mValue.y, key1.mValue.z, key1.mValue.w);
+				XMVECTOR q2 = XMVectorSet(key2.mValue.x, key2.mValue.y, key2.mValue.z, key2.mValue.w);
+				XMVECTOR qInterp = XMQuaternionSlerp(q1, q2, (float)t);
+				
+				XMStoreFloat4(&rotation, qInterp);
+			}
+
+			// スケールの補間
+			if (nodeAnim->mNumScalingKeys > 0)
+			{
+				int scaleKeyIdx = 0;
+				for (unsigned int k = 0; k < nodeAnim->mNumScalingKeys - 1; k++)
+				{
+					if (animationTick <= nodeAnim->mScalingKeys[k + 1].mTime)
+					{
+						scaleKeyIdx = k;
+						break;
+					}
+				}
+
+				aiVectorKey& key1 = nodeAnim->mScalingKeys[scaleKeyIdx];
+				aiVectorKey& key2 = nodeAnim->mScalingKeys[(scaleKeyIdx + 1) % nodeAnim->mNumScalingKeys];
+
+				double timeDiff = key2.mTime - key1.mTime;
+				double t = 0.0;
+				if (timeDiff > 0.001)
+				{
+					t = (animationTick - key1.mTime) / timeDiff;
+					t = std::max(0.0, std::min(1.0, t));  // 0-1の範囲でクランプ
+				}
+
+				scale.x = key1.mValue.x + (key2.mValue.x - key1.mValue.x) * (float)t;
+				scale.y = key1.mValue.y + (key2.mValue.y - key1.mValue.y) * (float)t;
+				scale.z = key1.mValue.z + (key2.mValue.z - key1.mValue.z) * (float)t;
+			}
+
+			// 行列を計算（スケール → 回転 → 位置）
+			XMMATRIX scaleMat = XMMatrixScaling(scale.x, scale.y, scale.z);
+			XMMATRIX rotMat = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation));
+			XMMATRIX transMat = XMMatrixTranslation(position.x, position.y, position.z);
+
+			outBoneMatrices.matrices[outBoneMatrices.boneCount] = scaleMat * rotMat * transMat;
+			outBoneMatrices.boneCount++;
+		}
+	}
+}
+
+// モデルのサイズを取得
+XMFLOAT3 ModelGetSize(MODEL* model)
+{
+	if (!model || !model->AiScene)
+	{
+		return XMFLOAT3(0.0f, 0.0f, 0.0f);
+	}
+
+	XMFLOAT3 minBounds(FLT_MAX, FLT_MAX, FLT_MAX);
+	XMFLOAT3 maxBounds(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
 	for (unsigned int m = 0; m < model->AiScene->mNumMeshes; m++)
 	{
 		aiMesh* mesh = model->AiScene->mMeshes[m];
 
 		for (unsigned int v = 0; v < mesh->mNumVertices; v++)
 		{
-			const aiVector3D& vertex = mesh->mVertices[v];
+			aiVector3D pos = mesh->mVertices[v];
 
-			minX = std::min(minX, vertex.x);
-			minY = std::min(minY, vertex.y);
-			minZ = std::min(minZ, vertex.z);
+			minBounds.x = std::min(minBounds.x, pos.x);
+			minBounds.y = std::min(minBounds.y, pos.y);
+			minBounds.z = std::min(minBounds.z, pos.z);
 
-			maxX = std::max(maxX, vertex.x);
-			maxY = std::max(maxY, vertex.y);
-			maxZ = std::max(maxZ, vertex.z);
+			maxBounds.x = std::max(maxBounds.x, pos.x);
+			maxBounds.y = std::max(maxBounds.y, pos.y);
+			maxBounds.z = std::max(maxBounds.z, pos.z);
 		}
 	}
 
-	// 無限大のままの場合はデフォルト値を返す
-	if (minX == FLT_MAX || maxX == -FLT_MAX)
-	{
-		return XMFLOAT3(1.0f, 1.0f, 1.0f);
-	}
-
-	// サイズを計算（最大座標 - 最小座標）
 	XMFLOAT3 size(
-		maxX - minX,
-		maxY - minY,
-		maxZ - minZ
+		maxBounds.x - minBounds.x,
+		maxBounds.y - minBounds.y,
+		maxBounds.z - minBounds.z
 	);
-
-	// サイズが0の場合は最小値を設定
-	if (size.x == 0.0f) size.x = 1.0f;
-	if (size.y == 0.0f) size.y = 1.0f;
-	if (size.z == 0.0f) size.z = 1.0f;
 
 	return size;
 }
 
-// モデルの平均的なマテリアルカラーを取得する関数
+// マテリアルの平均色を取得
 XMFLOAT4 ModelGetAverageMaterialColor(MODEL* model)
 {
-	if (!model || !model->AiScene || model->AiScene->mNumMeshes == 0)
+	if (!model || !model->AiScene || model->AiScene->mNumMaterials == 0)
 	{
-		return XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);  // デフォルトは白
+		return XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+	unsigned int count = 0;
 
-	// すべてのメッシュのマテリアルカラーの平均を計算
-	for (unsigned int m = 0; m < model->AiScene->mNumMeshes; m++)
+	for (unsigned int m = 0; m < model->AiScene->mNumMaterials; m++)
 	{
-		r += model->MeshMaterials[m].diffuseColor.x;
-		g += model->MeshMaterials[m].diffuseColor.y;
-		b += model->MeshMaterials[m].diffuseColor.z;
-		a += model->MeshMaterials[m].diffuseColor.w;
+		if (!model->MeshMaterials || m >= model->AiScene->mNumMeshes) continue;
+
+		XMFLOAT4 matColor = model->MeshMaterials[m].diffuseColor;
+
+		r += matColor.x;
+		g += matColor.y;
+		b += matColor.z;
+		a += matColor.w;
+		count++;
 	}
 
-	unsigned int meshCount = model->AiScene->mNumMeshes;
-	return XMFLOAT4(
-		r / meshCount,
-		g / meshCount,
-		b / meshCount,
-		a / meshCount
-	);
+	if (count > 0)
+	{
+		return XMFLOAT4(r / count, g / count, b / count, a / count);
+	}
+
+	return XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 }
