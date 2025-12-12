@@ -9,6 +9,7 @@
 #include "debug_ostream.h"
 #include <DirectXMath.h>
 #include <vector>
+#include <string>
 using namespace DirectX;
 
 // アニメーション用キーフレーム構造体
@@ -32,9 +33,10 @@ struct AnimationClip {
 // アニメーション再生状態
 struct AnimationState {
 	const AnimationClip* clip = nullptr;
-	double time = 0.0;             // 現在の再生位置（ティック）
+	double time = 0.0;             // 現在の再生位置（単位: ティック）
 	bool play = false;             // 再生中フラグ
 	bool loop = true;              // ループフラグ
+	std::string currentAnimName = "";  // 現在再生中のアニメーション名
 };
 
 // マテリアル用定数バッファ
@@ -45,11 +47,21 @@ struct MaterialCB {
 	int pad[2];
 };
 
+// アニメーション遷移（ブレンド）状態
+struct AnimationBlendState {
+	bool isBlending = false;          // ブレンド中フラグ
+	double blendDuration = 0.3;       // ブレンド時間（秒）
+	double blendElapsed = 0.0;        // ブレンド経過時間（秒）
+	AnimationClip targetClip;         // 遷移先アニメーション
+	AnimationState previousState;     // 遷移前のアニメーション状態（スナップショット）
+};
+
 class AnimSprite3D : public Sprite3D
 {
 protected:
 	AnimationState m_AnimState;
 	AnimationClip m_AnimClip;
+	AnimationBlendState m_BlendState;  // アニメーション遷移用
 	BoneMatrices m_BoneMatrices;
 	int m_BoneCount = 0;
 
@@ -90,11 +102,13 @@ public:
 	*/
 
 	// アニメーション再生制御
+	// アニメーション再生開始（ローカルで設定済みのアニメーションを再生）
 	void PlayAnimation(bool loop = true)
 	{
 		m_AnimState.play = true;
 		m_AnimState.loop = loop;
 		m_AnimState.time = 0.0;
+		// currentAnimName は SetAnimationClip で設定されるか、各再生関数で設定される
 	}
 
 	void StopAnimation()
@@ -165,6 +179,15 @@ public:
 	// インデックスからアニメーションを再生
 	bool PlayAnimationByIndex(unsigned int index, bool loop = true);
 
+	// ブレンド時間の設定（秒単位）
+	void SetAnimationBlendDuration(double duration)
+	{
+		m_BlendState.blendDuration = duration;
+	}
+
+	// 現在のブレンド状態を取得
+	bool IsAnimationBlending() const { return m_BlendState.isBlending; }
+
 private:
 	// 内部用：FBX内のアニメーションから AnimationClip を作成・設定
 	void SetAnimationClip(const AnimationClip& clip)
@@ -174,4 +197,7 @@ private:
 		m_AnimState.time = 0.0;
 		m_AnimState.play = false;
 	}
+
+	// ブレンド用補助関数：特定の状態から骨行列を計算
+	void UpdateBoneMatricesForState(const AnimationState& state, BoneMatrices& outMatrices);
 };

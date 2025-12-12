@@ -181,6 +181,21 @@ XMFLOAT4 AnimSprite3D::InterpolateQuat(const std::vector<KeyQuat>& keys, double 
 
 void AnimSprite3D::UpdateAnimation(float dt)
 {
+	// ブレンド処理
+	if (m_BlendState.isBlending)
+	{
+		m_BlendState.blendElapsed += dt;
+		
+		if (m_BlendState.blendElapsed >= m_BlendState.blendDuration)
+		{
+			// ブレンド完了：新しいアニメーションに切り替え
+			m_BlendState.isBlending = false;
+			SetAnimationClip(m_BlendState.targetClip);
+			PlayAnimation(m_AnimState.loop);
+			hal::dout << "Animation blend completed" << std::endl;
+		}
+	}
+
 	if (!m_AnimState.play || !m_AnimState.clip)
 	{
 		return;
@@ -221,6 +236,48 @@ void AnimSprite3D::UpdateAnimation(float dt)
 
 void AnimSprite3D::UpdateBoneMatrices()
 {
+	// ブレンド中の場合は特別処理
+	if (m_BlendState.isBlending)
+	{
+		double blendT = m_BlendState.blendElapsed / m_BlendState.blendDuration;
+		if (blendT > 1.0) blendT = 1.0;
+		
+		// 前のアニメーション状態から骨行列を計算
+		UpdateBoneMatricesForState(m_BlendState.previousState, m_BoneMatrices);
+		
+		// 新しいアニメーション状態から骨行列を計算
+		BoneMatrices targetMatrices;
+		AnimationState tempState;
+		tempState.clip = &m_BlendState.targetClip;
+		tempState.time = 0.0;  // 新しいアニメーションは開始位置から
+		UpdateBoneMatricesForState(tempState, targetMatrices);
+		
+		// 2つの行列をブレンド（各成分を線形補間）
+		float blendF = (float)blendT;
+		for (int i = 0; i < BoneMatrices::MAX_BONES; i++)
+		{
+			// 行列の各成分を線形補間
+			XMMATRIX from = m_BoneMatrices.matrices[i];
+			XMMATRIX to = targetMatrices.matrices[i];
+			
+			// 行列を浮動小数点配列に変換
+			float fromM[16], toM[16];
+			XMStoreFloat4x4((XMFLOAT4X4*)fromM, from);
+			XMStoreFloat4x4((XMFLOAT4X4*)toM, to);
+			
+			// 各成分を線形補間
+			float blendM[16];
+			for (int j = 0; j < 16; j++)
+			{
+				blendM[j] = fromM[j] * (1.0f - blendF) + toM[j] * blendF;
+			}
+			
+			// ブレンド結果を行列に戻す
+			m_BoneMatrices.matrices[i] = XMLoadFloat4x4((const XMFLOAT4X4*)blendM);
+		}
+		return;
+	}
+
 	if (!m_AnimState.clip || m_AnimState.clip->tracks.empty())
 	{
 		// アニメーションがない場合はアイデンティティ行列で初期化
@@ -240,7 +297,7 @@ void AnimSprite3D::UpdateBoneMatrices()
 
 	// トラックのサイズ分だけ行列を更新
 	int trackSize = (int)clip.tracks.size();
-	for (int i = 0; i < trackSize && i < BoneMatrices::MAX_BONES; i++)
+for (int i = 0; i < trackSize && i < BoneMatrices::MAX_BONES; i++)
 	{
 		const BoneKeyframes& keyframes = clip.tracks[i];
 
@@ -427,6 +484,13 @@ bool AnimSprite3D::PlayAnimationByName(const char* animName, bool loop)
         return false;
     }
 
+    // 現在再生中のアニメーションと同じ名前の場合は無視
+    if (m_AnimState.play && m_AnimState.currentAnimName == animName)
+    {
+        hal::dout << "PlayAnimationByName: Animation '" << animName << "' is already playing, ignoring call" << std::endl;
+        return true;  // 既に再生中なので成功として扱う
+    }
+
     hal::dout << "PlayAnimationByName: Looking for '" << animName << "', numAnimations=" << m_Model->AiScene->mNumAnimations << std::endl;
 
     // FBX内から名前でアニメーションを検索
@@ -443,8 +507,27 @@ bool AnimSprite3D::PlayAnimationByName(const char* animName, bool loop)
             AnimationClip clip = ExtractAnimationFromAssimp(aiAnim);
             hal::dout << "  -> Extracted: tps=" << clip.tps << " duration=" << clip.duration << " tracks=" << clip.tracks.size() << std::endl;
             
-            SetAnimationClip(clip);
-            PlayAnimation(loop);
+            // 別のアニメーションが再生中の場合、ブレンド遷移を開始
+            if (m_AnimState.play && m_AnimState.currentAnimName != animName)
+            {
+                hal::dout << "Animation: Blending from '" << m_AnimState.currentAnimName << "' to '" << animName << "'" << std::endl;
+                
+                // 現在の状態をスナップショット
+                m_BlendState.previousState = m_AnimState;
+                m_BlendState.targetClip = clip;
+                m_BlendState.isBlending = true;
+                m_BlendState.blendElapsed = 0.0;
+                m_BlendState.blendDuration = 0.3;  // 0.3秒でブレンド
+            }
+            else
+            {
+                // 初回起動時は通常の再生開始
+                SetAnimationClip(clip);
+                PlayAnimation(loop);
+            }
+            
+            m_AnimState.currentAnimName = animName;  // 現在再生中のアニメーション名を保存
+            m_AnimState.loop = loop;
             
             hal::dout << "Animation '" << animName << "' started" << std::endl;
             return true;
@@ -485,8 +568,56 @@ bool AnimSprite3D::PlayAnimationByIndex(unsigned int index, bool loop)
     AnimationClip clip = ExtractAnimationFromAssimp(aiAnim);
     SetAnimationClip(clip);
     PlayAnimation(loop);
+    m_AnimState.currentAnimName = aiAnim->mName.data;  // アニメーション名を保存
 
     hal::dout << "AnimSprite3D::PlayAnimationByIndex() - Playing animation at index " << index 
               << " (name: " << aiAnim->mName.data << ")" << std::endl;
     return true;
+}
+
+// ============================================================
+// ブレンド用補助関数
+// ============================================================
+
+void AnimSprite3D::UpdateBoneMatricesForState(const AnimationState& state, BoneMatrices& outMatrices)
+{
+	if (!state.clip || state.clip->tracks.empty())
+	{
+		// アニメーションがない場合はアイデンティティ行列で初期化
+		for (int i = 0; i < BoneMatrices::MAX_BONES; i++)
+		{
+			outMatrices.matrices[i] = XMMatrixIdentity();
+		}
+		return;
+	}
+
+	const AnimationClip& clip = *state.clip;
+	double time = state.time;
+
+	// 時間の範囲チェック
+	if (time < 0.0) time = 0.0;
+	if (time > clip.duration) time = clip.duration;
+
+	// トラックのサイズ分だけ行列を更新
+	int trackSize = (int)clip.tracks.size();
+	for (int i = 0; i < trackSize && i < BoneMatrices::MAX_BONES; i++)
+	{
+		const BoneKeyframes& keyframes = clip.tracks[i];
+
+		XMFLOAT3 trans = InterpolateVec3(keyframes.trans, time);
+		XMFLOAT4 rot = InterpolateQuat(keyframes.rot, time);
+		XMFLOAT3 scale = InterpolateVec3(keyframes.scale, time);
+
+		XMMATRIX scaleMat = XMMatrixScaling(scale.x, scale.y, scale.z);
+		XMMATRIX rotMat = QuatToMatrix(rot);
+		XMMATRIX transMat = XMMatrixTranslation(trans.x, trans.y, trans.z);
+
+		outMatrices.matrices[i] = scaleMat * rotMat * transMat;
+	}
+
+	// 未使用のボーン行列はアイデンティティで初期化
+	for (int i = trackSize; i < BoneMatrices::MAX_BONES; i++)
+	{
+		outMatrices.matrices[i] = XMMatrixIdentity();
+	}
 }
