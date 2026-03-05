@@ -82,6 +82,11 @@ Camera* GetCamera(void)
 	return CameraObject;
 }
 
+void Camera_SetDistance(float dist)
+{
+	CameraObject->SetDistance(dist);
+}
+
 void Camera::Update()
 {
 	Mouse_State mouseState;
@@ -163,14 +168,18 @@ void Camera::Update()
 		}
 	}
 
+	// カメラ距離をターゲットへ滑らかに補間
+	const float DIST_LERP_SPEED = 0.05f;
+	m_distance += (m_targetDistance - m_distance) * DIST_LERP_SPEED;
+
 	XMVECTOR targetVec = XMLoadFloat3(&m_targetPos);
 
 	float pitchRad = XMConvertToRadians(m_pitch);
 	float yawRad = XMConvertToRadians(m_yaw);
 
-	float camX = -sinf(yawRad) * cosf(pitchRad) * CAMERA_DISTANCE;
-	float camY = -sinf(pitchRad) * CAMERA_DISTANCE + 0.1f;
-	float camZ = -cosf(yawRad) * cosf(pitchRad) * CAMERA_DISTANCE;
+	float camX = -sinf(yawRad) * cosf(pitchRad) * m_distance;
+	float camY = -sinf(pitchRad) * m_distance + 0.1f;
+	float camZ = -cosf(yawRad) * cosf(pitchRad) * m_distance;
 
 	XMVECTOR cameraPos = XMVectorAdd(targetVec, XMVectorSet(camX, camY, camZ, 0.0f));
 

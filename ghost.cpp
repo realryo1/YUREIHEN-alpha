@@ -36,6 +36,21 @@ static float GetCurrentScareRange()
 	return SCARE_COMBO_BASE_RADIUS + (combo - 1) * SCARE_COMBO_RADIUS_STEP;
 }
 
+// 現在のフロアにバスターズ（通常 or チュートリアル）が1体でもいるか
+static bool HasAnyBusterOnCurrentFloor()
+{
+	if (Busters_GetCurrentFloorCount() > 0)
+	{
+		return true;
+	}
+	TutorialBusters* pTutBuster = GetTutorialBusters();
+	if (pTutBuster && pTutBuster->GetState() != TB_STUN)
+	{
+		return true;
+	}
+	return false;
+}
+
 static float GetActionEffectiveRange(Furniture* pFurniture, float baseRange)
 {
     if (!pFurniture)
@@ -78,6 +93,17 @@ static XMFLOAT3 CalcSafeExitPos(XMFLOAT3 origin)
 		}
 	}
 	return origin;
+}
+
+// 全家具のゴーストターゲットフラグをリセットする
+static void ResetAllFurnitureGhostTarget()
+{
+	int count = GetFurnitureCount();
+	for (int i = 0; i < count; i++)
+	{
+		Furniture* pF = GetFurniture(i);
+		if (pF) pF->SetIsGhostTarget(false);
+	}
 }
 
 // 円のサイズと位置を更新するヘルパー関数
@@ -323,6 +349,10 @@ void Ghost_Update(void)
 
 		if (Keyboard_IsKeyDownTrigger(KK_SPACE))
 		{
+			if (!HasAnyBusterOnCurrentFloor() || Game_IsFloorExitAnimActive())
+			{
+				break;
+			}
 
 			UpdateRangeCircleState();
 
@@ -334,10 +364,24 @@ void Ghost_Update(void)
 			g_Ghost->SetVelocity({ 0.0f, 0.0f, 0.0f });
 			g_Ghost->m_HasIncreasedMultiplier = false;
 			g_Ghost->SetIsDraw(false);
+			Camera_SetDistance(CAMERA_DISTANCE_TRANSFORM);
 		}
 		break;
 
 	case GS_TRANSFORM:
+		if (!HasAnyBusterOnCurrentFloor() || Game_IsFloorExitAnimActive())
+		{
+			ResetAllFurnitureGhostTarget();
+			UpdateRangeCircleState();
+			XMFLOAT3 autoExitPos = CalcSafeExitPos(g_Ghost->GetPos());
+			g_Ghost->ResetPos();
+			g_Ghost->SetPos(autoExitPos);
+			g_Ghost->SetState(GS_MOVING);
+			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
+			break;
+		}
+
 		UpdateLureFurnitureMovement();
 		g_Ghost->Transforming();
 
@@ -374,13 +418,26 @@ void Ghost_Update(void)
 			g_Ghost->SetPos(exitPos);
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 		}
 		break;
 
 	case GS_SCARE:
+		if (!HasAnyBusterOnCurrentFloor() || Game_IsFloorExitAnimActive())
+		{
+			ResetAllFurnitureGhostTarget();
+			UpdateRangeCircleState();
+			XMFLOAT3 scareAutoExit = CalcSafeExitPos(g_Ghost->GetPos());
+			g_Ghost->ResetPos();
+			g_Ghost->SetPos(scareAutoExit);
+			g_Ghost->SetState(GS_MOVING);
+			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
+			break;
+		}
+
 		g_Ghost->Transforming();
 
-		// 家具のジャンプが終わったら移動状態に戻る
 		if (FurnitureScareEnded(g_Ghost->GetInRangeNum()))
 		{
 			UpdateRangeCircleState();
@@ -393,6 +450,7 @@ void Ghost_Update(void)
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->m_ScareCooldown = 60; // 驚かし後1秒のクールタイム
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 		}
 		break;
 
@@ -722,6 +780,17 @@ void Ghost::FurnitureSearch(void)
 		return;
 	}
 
+	// バスターズがいない or フロア降下中は家具検知しない
+	if (!HasAnyBusterOnCurrentFloor() || Game_IsFloorExitAnimActive())
+	{
+		ResetAllFurnitureGhostTarget();
+		m_InRangeFurnitureList.clear();
+		m_InRangeFurnitureNum = -1;
+		m_SelectedFurnitureListIndex = 0;
+		this->SetState(GS_MOVING);
+		return;
+	}
+
 	// 範囲内にある全ての家具のインデックスをリストアップする
 	std::vector<int> currentList;
 
@@ -893,6 +962,7 @@ void Ghost_ForceExitTransform(void)
 
 	g_Ghost->SetState(GS_MOVING);
 	g_Ghost->SetIsDraw(true);
+	Camera_SetDistance(CAMERA_DISTANCE);
 }
 
 Ghost* GetGhost(void)
