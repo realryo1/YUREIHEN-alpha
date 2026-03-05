@@ -68,6 +68,7 @@
 #define PITCH_LIMIT_LOOK_DOWN  (-60.0f)  // 下を見る限界（カメラが上がる限界）: 天井埋まり防止
 #define MOUSE_SENSITIVITY (0.15f)
 #define CAMERA_DISTANCE (6.0f)  // カメラ距離
+#define CAMERA_DISTANCE_TRANSFORM (9.0f) // 変身時のカメラ距離
 #define CAMERA_OFFSET_Y (1.5f)  // 注視点のオフセット
 
 //=== Furniture 関連定数 ===

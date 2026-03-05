@@ -364,6 +364,7 @@ void Ghost_Update(void)
 			g_Ghost->SetVelocity({ 0.0f, 0.0f, 0.0f });
 			g_Ghost->m_HasIncreasedMultiplier = false;
 			g_Ghost->SetIsDraw(false);
+			Camera_SetDistance(CAMERA_DISTANCE_TRANSFORM);
 		}
 		break;
 
@@ -377,6 +378,7 @@ void Ghost_Update(void)
 			g_Ghost->SetPos(autoExitPos);
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 			break;
 		}
 
@@ -416,6 +418,7 @@ void Ghost_Update(void)
 			g_Ghost->SetPos(exitPos);
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 		}
 		break;
 
@@ -429,6 +432,7 @@ void Ghost_Update(void)
 			g_Ghost->SetPos(scareAutoExit);
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 			break;
 		}
 
@@ -446,6 +450,7 @@ void Ghost_Update(void)
 			g_Ghost->SetState(GS_MOVING);
 			g_Ghost->m_ScareCooldown = 60; // 驚かし後1秒のクールタイム
 			g_Ghost->SetIsDraw(true);
+			Camera_SetDistance(CAMERA_DISTANCE);
 		}
 		break;
 
@@ -957,6 +962,7 @@ void Ghost_ForceExitTransform(void)
 
 	g_Ghost->SetState(GS_MOVING);
 	g_Ghost->SetIsDraw(true);
+	Camera_SetDistance(CAMERA_DISTANCE);
 }
 
 Ghost* GetGhost(void)

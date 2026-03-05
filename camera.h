@@ -24,6 +24,8 @@ protected:
 	float m_lastYaw;
 	XMFLOAT3 m_targetPos;
 	float m_sensitivity;
+	float m_distance;
+	float m_targetDistance;
 	int m_skipInputFrames;
 	bool m_isLookTransition;
 	float m_lookTransitionTime;
@@ -45,7 +47,9 @@ public:
 		:m_Pos(pos), m_AtPos(atpos), m_UpVec(upvec),
 		m_Fov(fov), m_Aspect(aspect), m_Near(near_), m_Far(far_),
 		m_pitch(0.0f), m_yaw(0.0f), m_lastPitch(0.0f), m_lastYaw(0.0f),
-		m_targetPos(0.0f, 0.0f, 0.0f), m_sensitivity(0.1f), m_skipInputFrames(0),
+		m_targetPos(0.0f, 0.0f, 0.0f), m_sensitivity(0.1f),
+		m_distance(CAMERA_DISTANCE), m_targetDistance(CAMERA_DISTANCE),
+		m_skipInputFrames(0),
 		m_isLookTransition(false), m_lookTransitionTime(0.0f), m_lookTransitionDuration(0.0f),
 		m_lookStartYaw(0.0f), m_lookStartPitch(0.0f), m_lookEndYaw(0.0f), m_lookEndPitch(0.0f)
 	{
@@ -89,6 +93,7 @@ public:
 	float GetPitch(void) const { return m_pitch; }
 	void SetSensitivity(float sensitivity) { m_sensitivity = sensitivity; }
 	float GetSensitivity() const { return m_sensitivity; }
+	void SetDistance(float dist) { m_targetDistance = dist; }
 	void SkipNextInput(int frames = 2) { m_skipInputFrames = frames; }
 };
 
@@ -105,3 +110,6 @@ Camera* GetCamera(void);
 //マウス感度設定
 void Camera_SetSensitivity(float sensitivity);
 float Camera_GetSensitivity();
+
+// カメラ距離設定
+void Camera_SetDistance(float dist);
