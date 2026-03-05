@@ -11,285 +11,11 @@
 #include "mouse.h"
 #include "sound.h"
 #include "ClickFont.h"
-#include <mfapi.h>
-#include <mfmediaengine.h>
-#include <mfidl.h>
-#include <d3d10.h>
+#include "movie.h"
 #include <string>
 #include <cmath>
 #include "WinAnim.h"
 using namespace DirectX;
-
-#pragma comment(lib, "mfplat.lib")
-#pragma comment(lib, "mfuuid.lib")
-
-template<class T>
-static void SafeReleaseCOM(T*& p)
-{
-	if (p)
-	{
-		p->Release();
-		p = nullptr;
-	}
-}
-
-class TitleMediaEngineNotify : public IMFMediaEngineNotify
-{
-public:
-	TitleMediaEngineNotify() : m_refCount(1), m_canPlay(false), m_pEngine(nullptr) {}
-
-	void SetEngine(IMFMediaEngine* pEngine)
-	{
-		m_pEngine = pEngine;
-	}
-
-	bool CanPlay() const
-	{
-		return m_canPlay;
-	}
-
-	STDMETHODIMP QueryInterface(REFIID riid, void** ppv) override
-	{
-		if (!ppv) return E_POINTER;
-		if (riid == IID_IUnknown || riid == __uuidof(IMFMediaEngineNotify))
-		{
-			*ppv = static_cast<IMFMediaEngineNotify*>(this);
-			AddRef();
-			return S_OK;
-		}
-		*ppv = nullptr;
-		return E_NOINTERFACE;
-	}
-
-	STDMETHODIMP_(ULONG) AddRef() override
-	{
-		return (ULONG)InterlockedIncrement(&m_refCount);
-	}
-
-	STDMETHODIMP_(ULONG) Release() override
-	{
-		ULONG count = (ULONG)InterlockedDecrement(&m_refCount);
-		if (count == 0)
-		{
-			delete this;
-		}
-		return count;
-	}
-
-	STDMETHODIMP EventNotify(DWORD meEvent, DWORD_PTR, DWORD) override
-	{
-		if (meEvent == MF_MEDIA_ENGINE_EVENT_CANPLAY)
-		{
-			m_canPlay = true;
-			if (m_pEngine)
-			{
-				m_pEngine->Play();
-			}
-		}
-		return S_OK;
-	}
-
-private:
-	~TitleMediaEngineNotify() = default;
-	LONG m_refCount;
-	bool m_canPlay;
-	IMFMediaEngine* m_pEngine;
-};
-
-static IMFDXGIDeviceManager* g_pDXGIDeviceManager = nullptr;
-static IMFMediaEngine* g_pMediaEngine = nullptr;
-static TitleMediaEngineNotify* g_pMediaEngineNotify = nullptr;
-static ID3D11Texture2D* g_pVideoTexture = nullptr;
-static ID3D11ShaderResourceView* g_pVideoSRV = nullptr;
-static UINT g_DxgiResetToken = 0;
-static void FinalizeTitleMovie();
-
-static std::wstring MakeFileUrl(const wchar_t* relativePath)
-{
-	wchar_t fullPath[MAX_PATH] = {};
-	if (!GetFullPathNameW(relativePath, MAX_PATH, fullPath, nullptr))
-	{
-		return L"";
-	}
-
-	std::wstring url = L"file:///";
-
-	for (wchar_t ch : std::wstring(fullPath))
-	{
-		url.push_back((ch == L'\\') ? L'/' : ch);
-	}
-
-	return url;
-}
-
-static bool InitializeTitleMovie()
-{
-	ID3D11Device* pDevice = Direct3D_GetDevice();
-	if (!pDevice) return false;
-	FinalizeTitleMovie();
-
-	// D3D11デバイスのマルチスレッド保護を有効化（IMFMediaEngineはバックグラウンドスレッドからアクセスする）
-	ID3D10Multithread* pMultithread = nullptr;
-	HRESULT hr = pDevice->QueryInterface(__uuidof(ID3D10Multithread), (void**)&pMultithread);
-	if (SUCCEEDED(hr) && pMultithread)
-	{
-		pMultithread->SetMultithreadProtected(TRUE);
-		pMultithread->Release();
-	}
-
-	// ビデオテクスチャは動画の解像度に合わせる（3840x2160では大きすぎる）
-	const UINT videoTexW = 1920;
-	const UINT videoTexH = 1080;
-
-	D3D11_TEXTURE2D_DESC texDesc{};
-	texDesc.Width = videoTexW;
-	texDesc.Height = videoTexH;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-
-	hr = pDevice->CreateTexture2D(&texDesc, nullptr, &g_pVideoTexture);
-	if (FAILED(hr)) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = texDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = 1;
-	hr = pDevice->CreateShaderResourceView(g_pVideoTexture, &srvDesc, &g_pVideoSRV);
-	if (FAILED(hr)) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	hr = MFCreateDXGIDeviceManager(&g_DxgiResetToken, &g_pDXGIDeviceManager);
-	if (FAILED(hr)) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	hr = g_pDXGIDeviceManager->ResetDevice(pDevice, g_DxgiResetToken);
-	if (FAILED(hr)) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	g_pMediaEngineNotify = new TitleMediaEngineNotify();
-	if (!g_pMediaEngineNotify) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	IMFAttributes* pAttributes = nullptr;
-	IMFMediaEngineClassFactory* pFactory = nullptr;
-
-	hr = MFCreateAttributes(&pAttributes, 4);
-	if (SUCCEEDED(hr))
-	{
-		hr = pAttributes->SetUnknown(MF_MEDIA_ENGINE_DXGI_MANAGER, g_pDXGIDeviceManager);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pAttributes->SetUnknown(MF_MEDIA_ENGINE_CALLBACK, g_pMediaEngineNotify);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pAttributes->SetUINT32(MF_MEDIA_ENGINE_VIDEO_OUTPUT_FORMAT, DXGI_FORMAT_B8G8R8A8_UNORM);
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = CoCreateInstance(CLSID_MFMediaEngineClassFactory, nullptr, CLSCTX_INPROC_SERVER,
-			IID_PPV_ARGS(&pFactory));
-	}
-	if (SUCCEEDED(hr))
-	{
-		hr = pFactory->CreateInstance(MF_MEDIA_ENGINE_REAL_TIME_MODE, pAttributes, &g_pMediaEngine);
-	}
-
-	SafeReleaseCOM(pFactory);
-	SafeReleaseCOM(pAttributes);
-
-	if (FAILED(hr) || !g_pMediaEngine)
-	{
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	g_pMediaEngineNotify->SetEngine(g_pMediaEngine);
-	g_pMediaEngine->SetLoop(TRUE);
-	g_pMediaEngine->SetMuted(TRUE);
-
-	std::wstring videoUrl = MakeFileUrl(L"asset\\texture\\titlemov.mp4");
-	if (videoUrl.empty()) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	BSTR bstrUrl = SysAllocString(videoUrl.c_str());
-	if (!bstrUrl) {
-		FinalizeTitleMovie();
-		return false;
-	}
-
-	g_pMediaEngine->SetSource(bstrUrl);
-	SysFreeString(bstrUrl);
-	g_pMediaEngine->Load();
-
-	return true;
-}
-
-static void UpdateTitleMovie()
-{
-	if (!g_pMediaEngine || !g_pVideoTexture) return;
-
-	// ビデオストリームが存在し、十分に読み込まれていることを確認
-	if (!g_pMediaEngine->HasVideo()) return;
-
-	if (g_pMediaEngine->GetReadyState() < MF_MEDIA_ENGINE_READY_HAVE_CURRENT_DATA) return;
-
-	LONGLONG pts = 0;
-	HRESULT hr = g_pMediaEngine->OnVideoStreamTick(&pts);
-	if (hr == S_OK)
-	{
-		// テクスチャの実際のサイズに合わせて転送先RECTを設定
-		D3D11_TEXTURE2D_DESC desc{};
-		g_pVideoTexture->GetDesc(&desc);
-		RECT dst = { 0, 0, (LONG)desc.Width, (LONG)desc.Height };
-		MFARGB border = { 255, 0, 0, 0 };
-		hr = g_pMediaEngine->TransferVideoFrame(g_pVideoTexture, nullptr, &dst, &border);
-		if (FAILED(hr))
-		{
-			// TransferVideoFrame失敗時は描画をスキップできるようSRVをnullに
-			SafeReleaseCOM(g_pVideoSRV);
-		}
-	}
-}
-
-static void FinalizeTitleMovie()
-{
-	// コールバックからのエンジン参照を先に解除（バックグラウンドスレッドからのアクセスを防ぐ）
-	if (g_pMediaEngineNotify)
-	{
-		g_pMediaEngineNotify->SetEngine(nullptr);
-	}
-
-	if (g_pMediaEngine)
-	{
-		g_pMediaEngine->Shutdown();
-	}
-
-	SafeReleaseCOM(g_pMediaEngine);
-	SafeReleaseCOM(g_pMediaEngineNotify);
-	SafeReleaseCOM(g_pDXGIDeviceManager);
-	SafeReleaseCOM(g_pVideoSRV);
-	SafeReleaseCOM(g_pVideoTexture);
-	g_DxgiResetToken = 0;
-}
 
 // ①Spriteのインスタンス、ポインタ用意
 static SplitSprite* g_pTitleSprite = nullptr;
@@ -299,6 +25,7 @@ static ClickFont* g_pModelViewerClickFont = nullptr;
 static Sprite* g_pSizeComparisonSprite = nullptr;
 static Sprite* g_pinazuma = nullptr;
 static SoundData* g_pBGM = nullptr;
+static Movie* g_pTitleMovie = nullptr;
 
 // 稲妻関連（opanim.cppから移植）
 static Sprite* g_pInazumaSprite = nullptr;
@@ -353,7 +80,14 @@ static float Clamp(float value, float min, float max)
 
 void Title_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	InitializeTitleMovie();
+	g_pTitleMovie = new Movie(
+		{ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f },
+		{ SCREEN_WIDTH, SCREEN_HEIGHT },
+		0.0f,
+		{ 1.0f, 1.0f, 1.0f, 1.0f },
+		BLENDSTATE_NONE,
+		L"asset\\texture\\titlemov.mp4"
+	);
 
 	// ②各種初期化
 	g_pTitleSprite = new SplitSprite(
@@ -451,7 +185,10 @@ void Title_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 void Title_Update(void)
 {
-	UpdateTitleMovie();
+	if (g_pTitleMovie)
+	{
+		g_pTitleMovie->Update();
+	}
 
 	// タイトルロゴ瞬きタイマー更新
 	g_LogoBlink.blinkTimer += (1.0f / 60.0f);	// 60FPS想定
@@ -537,16 +274,9 @@ void Title_Update(void)
 
 void Title_Draw(void)
 {
-	if (g_pVideoSRV)
+	if (g_pTitleMovie)
 	{
-		Sprite_Single_Draw(
-			{ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f },
-			{ SCREEN_WIDTH, SCREEN_HEIGHT },
-			0.0f,
-			{ 1.0f, 1.0f, 1.0f, 1.0f },
-			BLENDSTATE_NONE,
-			g_pVideoSRV
-		);
+		g_pTitleMovie->Draw();
 	}
 
 	// タイトルロゴ瞬きアルファ値の計算
@@ -567,7 +297,11 @@ void Title_Draw(void)
 
 void Title_Finalize(void)
 {
-	FinalizeTitleMovie();
+	if (g_pTitleMovie)
+	{
+		delete g_pTitleMovie;
+		g_pTitleMovie = nullptr;
+	}
 
 	delete g_pTitleSprite;
 	g_pTitleSprite = nullptr;

@@ -49,6 +49,7 @@
     <ClCompile Include="UI_messageframe.h" />
     <ClCompile Include="vote.cpp" />
     <ClCompile Include="UI_RetryMenu.cpp" />
+    <ClCompile Include="movie.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="ScoreClient.h" />
     <ClInclude Include="vote.h" />
     <ClInclude Include="UI_RetryMenu.h" />
+    <ClInclude Include="movie.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="convert_to_utf8bom.ps1" />

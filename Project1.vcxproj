@@ -177,6 +177,7 @@
     <ClCompile Include="minimap.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="mouse.cpp" />
+    <ClCompile Include="movie.cpp" />
     <ClCompile Include="opanim.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="ScoreClient.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="debugdraw.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="movie.h" />
     <ClInclude Include="opanim.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="result.h" />
