@@ -131,11 +131,15 @@ void Billboard::SetTexture(const char* texturePath)
 	if (texturePath)
 	{
 		std::string strPath(texturePath);
+		// 同じパスが既にロード済みなら再ロードしない
+		if (m_Texture && m_TexturePath == strPath) return;
+		m_TexturePath = strPath;
 		std::wstring wstrPath(strPath.begin(), strPath.end());
 		m_Texture = LoadTexture(wstrPath.c_str());
 	}
 	else
 	{
+		m_TexturePath.clear();
 		m_Texture = nullptr;
 	}
 }

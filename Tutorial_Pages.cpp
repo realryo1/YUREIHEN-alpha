@@ -170,8 +170,8 @@ void Tutorial_Pages_Init()
 	TutorialPage_EnableAllFurniturePossessionPhase();
 
 	AddPage({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 }, 0.0f, {
-		"チュートリアルはここまで！",
-		"どうやらバスターずは隣の部屋に行ったみたい。",
-		"次の部屋で憑依したり引き寄せたり……色々試してみて！",
+		"このゲームの肝は、「？」で「！」のとこにおびき寄せ",
+		"スペース連打でスコア稼ぐ！",
+		"次の部屋で色々試してみて！",
 		});
 }

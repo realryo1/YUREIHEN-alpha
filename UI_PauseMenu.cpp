@@ -16,6 +16,8 @@ using namespace DirectX;
 #include <string>
 #include "shader.h"
 #include "UI.h"
+#include "game.h"
+#include "field.h"
 
 // ==========================================
 // ポーズ画面用の変数
@@ -29,6 +31,7 @@ static ClickFont* g_pMouseSensitivityButtonFont = nullptr;
 static ClickFont* g_pBrightnessButtonFont = nullptr;
 static ClickFont* g_pTitleButtonFont = nullptr;
 static ClickFont* g_pTutorialImageButtonFont = nullptr; // 操作説明ボタン
+static ClickFont* g_pSkipFloorButtonFont = nullptr; // 次の階へ進むボタン
 
 // 左右矢印用フォント
 static ClickFont* g_pLeftArrowFont = nullptr;
@@ -166,6 +169,22 @@ void UI_PauseMenu_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 	});
 	g_MenuButtons[5] = { bx - 150.0f, by + gap * 5 - 25.0f, 300.0f, 50.0f, 5 };
 
+	// 次の階へ進む
+	g_pSkipFloorButtonFont = new ClickFont({ bx, by + gap * 6 }, 40.0f, 0.0f, normal, hover, "次の階へ進む（非常用）");
+	g_pSkipFloorButtonFont->SetHitSize({ 360.0f, 50.0f });
+	g_pSkipFloorButtonFont->SetOnClick([]() {
+		if (Field_GetCurrentFloor() > 0)
+		{
+			g_IsPause = false;
+			Mouse_SetMode(MOUSE_POSITION_MODE_RELATIVE);
+			ShowCursor(FALSE);
+			g_PauseMouseStateChangedFlag = false;
+			UI_RefreshTimerForPause();
+
+			Game_ForceSkipFloor();
+		}
+	});
+
 	// 左右矢印フォント（初期は透明）
 	g_pLeftArrowFont = new ClickFont({ bx - ARROW_OFFSET_X, by + gap }, 70.0f, 0.0f, { 1,1,1,0 }, { 1,1,1,0 }, "←");
 	g_pLeftArrowFont->SetHitSize({ ARROW_HIT_MARGIN_X * 2.0f, ARROW_HIT_MARGIN_Y * 2.0f });
@@ -301,6 +320,11 @@ void UI_PauseMenu_Finalize(void)
 		g_pTutorialImageButtonFont = nullptr;
 	}
 
+	if (g_pSkipFloorButtonFont) {
+		delete g_pSkipFloorButtonFont;
+		g_pSkipFloorButtonFont = nullptr;
+	}
+
 	// 左右矢印フォント
 	if (g_pLeftArrowFont) {
 		delete g_pLeftArrowFont;
@@ -381,6 +405,7 @@ void UI_PauseMenu_Update(void)
 	if (g_pBrightnessButtonFont) g_pBrightnessButtonFont->Update();
 	if (g_pTitleButtonFont) g_pTitleButtonFont->Update();
 	if (g_pTutorialImageButtonFont) g_pTutorialImageButtonFont->Update();
+	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0) g_pSkipFloorButtonFont->Update();
 
 	// 矢印は表示中のみUpdate（クリック判定もここに含む）
 	if (g_PauseCursor == 1 || g_PauseCursor == 2 || g_PauseCursor == 3)
@@ -396,6 +421,7 @@ void UI_PauseMenu_Update(void)
 	else if (g_pBrightnessButtonFont && g_pBrightnessButtonFont->IsHover()) g_PauseCursor = 3;
 	else if (g_pTitleButtonFont && g_pTitleButtonFont->IsHover()) g_PauseCursor = 4;
 	else if (g_pTutorialImageButtonFont && g_pTutorialImageButtonFont->IsHover()) g_PauseCursor = 5;
+	else if (g_pSkipFloorButtonFont && g_pSkipFloorButtonFont->IsHover() && Field_GetCurrentFloor() > 0) g_PauseCursor = 6;
 
 	// テキスト更新（クリック後の反映）
 	if (g_pVolumeButtonFont)
@@ -422,15 +448,16 @@ void UI_PauseMenu_Update(void)
 	// ボタン色はClickFont内蔵（通常色/ホバー色）に任せる
 
 	// 上下キーで項目選択
+	int maxCursor = (Field_GetCurrentFloor() > 0) ? 6 : 5;
 	if (Keyboard_IsKeyDownTrigger(KK_UP))
 	{
 		g_PauseCursor--;
-		if (g_PauseCursor < 0) g_PauseCursor = 5;
+		if (g_PauseCursor < 0) g_PauseCursor = maxCursor;
 	}
 	if (Keyboard_IsKeyDownTrigger(KK_DOWN))
 	{
 		g_PauseCursor++;
-		if (g_PauseCursor > 5) g_PauseCursor = 0;
+		if (g_PauseCursor > maxCursor) g_PauseCursor = 0;
 	}
 
 	// 左右キーで値変更（音量・マウス感度・明るさ選択中のみ）
@@ -545,6 +572,8 @@ void UI_PauseMenu_Update(void)
 		break;
 	case 5:
 		break;
+	case 6:
+		break;
 	}
 }
 
@@ -576,6 +605,7 @@ void UI_PauseMenu_Draw(void)
 	if (g_pBrightnessButtonFont) g_pBrightnessButtonFont->Draw();
 	if (g_pTitleButtonFont) g_pTitleButtonFont->Draw();
 	if (g_pTutorialImageButtonFont) g_pTutorialImageButtonFont->Draw();
+	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0) g_pSkipFloorButtonFont->Draw();
 
 	// 左右矢印（音量・マウス感度・明るさ変更用）
 	if (g_PauseCursor == 1 || g_PauseCursor == 2 || g_PauseCursor == 3)

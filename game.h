@@ -40,4 +40,7 @@ void  Game_StartLoseAnim(void);
 // 敗北アニメーションを終了しリソースを解放する（リトライメニューから呼ぶ）
 void  Game_EndLoseAnim(void);
 
+// フロアを強制的にスキップし次の階へ進む（ポーズメニュー用）
+void  Game_ForceSkipFloor(void);
+
 #endif // GAME_H

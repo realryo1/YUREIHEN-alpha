@@ -120,7 +120,6 @@ void TutorialMarker::SetPos(const XMFLOAT3& pos)
 	m_BasePos = pos;
 	// 複数座標モードをクリアして単一座標に戻す
 	m_PosList.clear();
-	RebuildArrows();
 	m_PosList.push_back(pos);
 	RebuildArrows();
 }

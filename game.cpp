@@ -234,7 +234,7 @@ void Game_Update(void)
 	{
 		// -------------------------------------------------------
 		// 敗北アニメーション（フェード遷移＋再生）
-		// -------------------------------------------------------
+// -------------------------------------------------------
 		if (g_LoseAnimState == LOSE_FADEOUT)
 		{
 			// フェードアウト完了を待つ
@@ -261,6 +261,12 @@ void Game_Update(void)
 	if (g_FloorExitState != FLOOR_EXIT_NONE)
 	{
 		fadeState = GetFadeState();
+
+		UI_PauseMenu_Update();
+		if (UI_PauseMenu_IsPaused())
+		{
+			return;
+		}
 
 		switch (g_FloorExitState)
 		{
@@ -389,7 +395,6 @@ void Game_Update(void)
 
 		case FLOOR_EXIT_PLAYER_WALK:
 			{
-				SetFloorExitMarkerVisible(true);
 				Camera_Update();
 				Shader_SetCameraPos(GetCamera()->GetPos());
 				Field_Update();
@@ -535,6 +540,7 @@ void Game_Update(void)
 #if !STOP_TIMER_BUSTER
 	// 3階のチュートリアル中（ページ表示中・テストプレイ待機中）は通常バスターズを更新しない
 	if (!(Field_GetCurrentFloor() == 2 && (UI_Tutorial_IsActive() || UI_Tutorial_IsWaiting())))
+
 	{
 		Busters_Update();
 	}
@@ -686,4 +692,17 @@ void Game_EndLoseAnim(void)
 
 	// ゲームBGMを再開
 	if (g_pBGM) PlaySound(g_pBGM, true);
+}
+
+// =================================================================
+// チュートリアル等でのフロア強制スキップ用
+// =================================================================
+void Game_ForceSkipFloor(void)
+{
+	int currentFloor = Field_GetCurrentFloor();
+	if (currentFloor <= 0) return;
+
+	g_FloorBeforeExit = currentFloor;
+	StartFade(SCENE_NONE);
+	g_FloorExitState = FLOOR_EXIT_FADEIN;
 }

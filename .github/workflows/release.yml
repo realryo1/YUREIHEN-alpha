@@ -53,6 +53,7 @@ jobs:
         Copy-Item -Path "assimp-vc143-mt.dll" -Destination "release" -Force
         Copy-Item -Path "asset" -Destination "release" -Recurse -Force
         Copy-Item -Path "SchemToArray" -Destination "release" -Recurse -Force
+        Copy-Item -Path "server_config.txt" -Destination "release" -Force
         
         Compress-Archive -Path "release/*" -DestinationPath "HEW_YUREIHEN_BUILD_v${{ steps.version.outputs.number }}.zip" -Force
 

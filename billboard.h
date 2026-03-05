@@ -75,6 +75,7 @@ public:
 private:
 	ID3D11Buffer* m_VertexBuffer;
 	ID3D11ShaderResourceView* m_Texture;
+	std::string m_TexturePath; // 現在ロード済みのテクスチャパス（再ロード防止用）
 
 	XMFLOAT3 m_Pos;
 	XMFLOAT2 m_Size;
