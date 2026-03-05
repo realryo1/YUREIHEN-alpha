@@ -77,54 +77,57 @@ static bool LoadServerConfig(std::string& outIP, int& outPort)
 
 bool Score_SendToServer(int score)
 {
-	// 設定ファイルを読み込む（失敗時はデフォルト値を使用）
-	std::string serverIP = DEFAULT_IP;
-	int         serverPort = DEFAULT_PORT;
-	LoadServerConfig(serverIP, serverPort);
+	std::thread([score]() {
+		// 設定ファイルを読み込む（失敗時はデフォルト値を使用）
+		std::string serverIP = DEFAULT_IP;
+		int         serverPort = DEFAULT_PORT;
+		LoadServerConfig(serverIP, serverPort);
 
-	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-	{
-		return false;
-	}
+		WSADATA wsaData;
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+		{
+			return;
+		}
 
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET)
-	{
-		WSACleanup();
-		return false;
-	}
+		SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (sock == INVALID_SOCKET)
+		{
+			WSACleanup();
+			return;
+		}
 
-	sockaddr_in serverAddr{};
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(serverPort);
-	serverAddr.sin_addr.s_addr = inet_addr(serverIP.c_str());
+		sockaddr_in serverAddr{};
+		serverAddr.sin_family = AF_INET;
+		serverAddr.sin_port = htons(serverPort);
+		serverAddr.sin_addr.s_addr = inet_addr(serverIP.c_str());
 
-	if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
-	{
-		closesocket(sock);
-		WSACleanup();
-		return false;
-	}
-
-	// int をそのまま送信（サーバーと同じ形式）
-	int totalSent = 0;
-	while (totalSent < (int)sizeof(int))
-	{
-		int sent = send(sock,
-			(char*)&score + totalSent,
-			sizeof(int) - totalSent,
-			0);
-		if (sent == SOCKET_ERROR)
+		if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 		{
 			closesocket(sock);
 			WSACleanup();
-			return false;
+			return;
 		}
-		totalSent += sent;
-	}
 
-	closesocket(sock);
-	WSACleanup();
+		// int をそのまま送信（サーバーと同じ形式）
+		int totalSent = 0;
+		while (totalSent < (int)sizeof(int))
+		{
+			int sent = send(sock,
+				(char*)&score + totalSent,
+				sizeof(int) - totalSent,
+				0);
+			if (sent == SOCKET_ERROR)
+			{
+				closesocket(sock);
+				WSACleanup();
+				return;
+			}
+			totalSent += sent;
+		}
+
+		closesocket(sock);
+		WSACleanup();
+	}).detach();
+
 	return true;
 }
