@@ -128,39 +128,3 @@ bool Score_SendToServer(int score)
 	WSACleanup();
 	return true;
 }
-
-// -------------------------------------------------------
-// 非同期送信用のグローバル変数
-// -------------------------------------------------------
-static std::atomic<bool> g_AsyncSendDone(true);
-static std::atomic<bool> g_AsyncSendResult(false);
-static std::thread       g_AsyncSendThread;
-
-void Score_SendToServerAsync(int score)
-{
-	// 前回のスレッドが残っていれば join して回収
-	if (g_AsyncSendThread.joinable())
-	{
-		g_AsyncSendThread.join();
-	}
-
-	g_AsyncSendDone = false;
-	g_AsyncSendResult = false;
-
-	g_AsyncSendThread = std::thread([score]()
-	{
-		bool result = Score_SendToServer(score);
-		g_AsyncSendResult = result;
-		g_AsyncSendDone = true;
-	});
-}
-
-bool Score_IsAsyncSendDone(void)
-{
-	return g_AsyncSendDone.load();
-}
-
-bool Score_GetAsyncSendResult(void)
-{
-	return g_AsyncSendResult.load();
-}

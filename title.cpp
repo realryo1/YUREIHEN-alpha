@@ -508,19 +508,30 @@ void Title_Update(void)
 		StartFade(SCENE_ANM_LOSE);
 	}
 
-	// ③適当な処理　アニメーションなどもここで
-	if (Keyboard_IsKeyDownTrigger(KK_X))
+	//// ③適当な処理　アニメーションなどもここで
+	//if (Keyboard_IsKeyDownTrigger(KK_X))
+	//{
+	//	StartFade(SCENE_RESULT);
+	//}
+	if (Keyboard_IsKeyDownTrigger(KK_P))
 	{
-		StartFade(SCENE_RESULT);
-	}
-	if (Keyboard_IsKeyDownTrigger(KK_F))
-	{
-		//3桁のスコアを適当にセット（Time=50, Combo=5 → Score=250）
-		WinAnim_SetResultData(350.0f, 5);
+		if (Keyboard_IsKeyDownTrigger(KK_O))
+		{		//3桁のスコアを適当にセット（Time=50, Combo=5 → Score=250）
+			WinAnim_SetResultData(150.0f, 5);
 
-		//Debug用
-		StartFade(SCENE_ANM_WIN);
+			//Debug用
+			StartFade(SCENE_ANM_WIN);
+		}
 	}
+
+	//if (Keyboard_IsKeyDownTrigger(KK_F))
+	//{
+	//	//3桁のスコアを適当にセット（Time=50, Combo=5 → Score=250）
+	//	WinAnim_SetResultData(350.0f, 5);
+
+	//	//Debug用
+	//	StartFade(SCENE_ANM_WIN);
+	//}
 
 }
 
