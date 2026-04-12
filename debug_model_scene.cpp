@@ -409,6 +409,7 @@ void DebugModelScene_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pCon
 
 	// ポーズメニュー初期化
 	UI_PauseMenu_Initialize(pDevice, pContext);
+	UI_PauseMenu_HideSkipFloorButton();
 }
 
 // ======================================================

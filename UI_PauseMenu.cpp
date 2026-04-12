@@ -32,6 +32,7 @@ static ClickFont* g_pBrightnessButtonFont = nullptr;
 static ClickFont* g_pTitleButtonFont = nullptr;
 static ClickFont* g_pTutorialImageButtonFont = nullptr; // 操作説明ボタン
 static ClickFont* g_pSkipFloorButtonFont = nullptr; // 次の階へ進むボタン
+static bool g_HideSkipFloorButton = false; // 次の階へ進むボタンを非表示にするフラグ
 
 // 左右矢印用フォント
 static ClickFont* g_pLeftArrowFont = nullptr;
@@ -92,6 +93,7 @@ void UI_PauseMenu_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 	g_PauseMouseStateChangedFlag = false;
 	g_IsShowingTutoImage = false;
 	g_TutoImagePage = 0;
+	g_HideSkipFloorButton = false;
 
 	// 初期音量を反映
 	SetMasterVolume(g_Volume);
@@ -405,7 +407,7 @@ void UI_PauseMenu_Update(void)
 	if (g_pBrightnessButtonFont) g_pBrightnessButtonFont->Update();
 	if (g_pTitleButtonFont) g_pTitleButtonFont->Update();
 	if (g_pTutorialImageButtonFont) g_pTutorialImageButtonFont->Update();
-	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0) g_pSkipFloorButtonFont->Update();
+	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0 && !g_HideSkipFloorButton) g_pSkipFloorButtonFont->Update();
 
 	// 矢印は表示中のみUpdate（クリック判定もここに含む）
 	if (g_PauseCursor == 1 || g_PauseCursor == 2 || g_PauseCursor == 3)
@@ -421,7 +423,7 @@ void UI_PauseMenu_Update(void)
 	else if (g_pBrightnessButtonFont && g_pBrightnessButtonFont->IsHover()) g_PauseCursor = 3;
 	else if (g_pTitleButtonFont && g_pTitleButtonFont->IsHover()) g_PauseCursor = 4;
 	else if (g_pTutorialImageButtonFont && g_pTutorialImageButtonFont->IsHover()) g_PauseCursor = 5;
-	else if (g_pSkipFloorButtonFont && g_pSkipFloorButtonFont->IsHover() && Field_GetCurrentFloor() > 0) g_PauseCursor = 6;
+	else if (g_pSkipFloorButtonFont && g_pSkipFloorButtonFont->IsHover() && Field_GetCurrentFloor() > 0 && !g_HideSkipFloorButton) g_PauseCursor = 6;
 
 	// テキスト更新（クリック後の反映）
 	if (g_pVolumeButtonFont)
@@ -448,7 +450,7 @@ void UI_PauseMenu_Update(void)
 	// ボタン色はClickFont内蔵（通常色/ホバー色）に任せる
 
 	// 上下キーで項目選択
-	int maxCursor = (Field_GetCurrentFloor() > 0) ? 6 : 5;
+	int maxCursor = (Field_GetCurrentFloor() > 0 && !g_HideSkipFloorButton) ? 6 : 5;
 	if (Keyboard_IsKeyDownTrigger(KK_UP))
 	{
 		g_PauseCursor--;
@@ -605,7 +607,7 @@ void UI_PauseMenu_Draw(void)
 	if (g_pBrightnessButtonFont) g_pBrightnessButtonFont->Draw();
 	if (g_pTitleButtonFont) g_pTitleButtonFont->Draw();
 	if (g_pTutorialImageButtonFont) g_pTutorialImageButtonFont->Draw();
-	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0) g_pSkipFloorButtonFont->Draw();
+	if (g_pSkipFloorButtonFont && Field_GetCurrentFloor() > 0 && !g_HideSkipFloorButton) g_pSkipFloorButtonFont->Draw();
 
 	// 左右矢印（音量・マウス感度・明るさ変更用）
 	if (g_PauseCursor == 1 || g_PauseCursor == 2 || g_PauseCursor == 3)
@@ -643,4 +645,9 @@ void UI_PauseMenu_SetPause(bool isPause)
 float UI_PauseMenu_GetBrightness(void)
 {
 	return g_Brightness;
+}
+
+void UI_PauseMenu_HideSkipFloorButton(void)
+{
+	g_HideSkipFloorButton = true;
 }

@@ -18,3 +18,4 @@ void UI_PauseMenu_Draw(void);
 bool UI_PauseMenu_IsPaused(void);
 void UI_PauseMenu_SetPause(bool isPause);
 float UI_PauseMenu_GetBrightness(void);
+void UI_PauseMenu_HideSkipFloorButton(void);
